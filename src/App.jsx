@@ -1,157 +1,217 @@
+const SECTIONS_ARRAY = [
+  {
+    id: "s1",
+    title: "What is React?",
+  },
+  {
+    id: "s2",
+    title: "Installation",
+  },
+  {
+    id: "s3",
+    title: "Basics",
+    topics: [
+      {
+        id: "tp1",
+        title: "useEffect",
+      },
+      {
+        id: "tp2",
+        title: "useState",
+      },
+      {
+        id: "tp3",
+        title: "useRef",
+      },
+      {
+        id: "tp4",
+        title: "props",
+      },
+      {
+        id: "tp5",
+        title: "useCallback",
+      },
+      {
+        id: "tp6",
+        title: "contextAPI",
+      },
+      {
+        id: "tp7",
+        title: "useReducer",
+      },
+      {
+        id: "tp8",
+        title: "useMemo",
+      },
+      {
+        id: "tp9",
+        title: "Built-in React components",
+      },
+      {
+        id: "tp10",
+        title: "Tips",
+      },
+    ],
+  },
+  {
+    id: "s4",
+    title: "Styling",
+    topics: [
+      {
+        id: "tp1",
+        title: "CSS styling",
+      },
+      {
+        id: "tp2",
+        title: "styled components",
+      },
+      {
+        id: "tp3",
+        title: "Tailwind CSS",
+      },
+    ],
+  },
+  {
+    id: "s5",
+    title: "Events",
+    topics: [
+      {
+        id: "tp1",
+        title: "Mouse events",
+      },
+      {
+        id: "tp2",
+        title: "Drag events",
+      },
+    ],
+  },
+  {
+    id: "s6",
+    title: "Advanced",
+    topics: [
+      {
+        id: "tp1",
+        title: "Class based components",
+      },
+      {
+        id: "tp2",
+        title: "Error handling",
+      },
+      {
+        id: "tp3",
+        title: "Custom hooks",
+      },
+      {
+        id: "tp4",
+        title: "Forms and user inputs",
+      },
+      {
+        id: "tp5",
+        title: "Reset user inputs",
+      },
+      {
+        id: "tp6",
+        title: "Input validation",
+      },
+    ],
+  },
+  {
+    id: "s7",
+    title: "Redux",
+    topics: [
+      {
+        id: "tp1",
+        title: "Redux intro",
+      },
+      {
+        id: "tp2",
+        title: "Redux with React - 1",
+      },
+      {
+        id: "tp3",
+        title: "Redux with React - 2",
+      },
+      {
+        id: "tp4",
+        title: "Redux Toolkit",
+      },
+      {
+        id: "tp5",
+        title: "Redux advanced",
+      },
+    ],
+  },
+  {
+    id: "s8",
+    title: "React router",
+    topics: [
+      {
+        id: "tp1",
+        title: "React router - 1",
+      },
+      {
+        id: "tp2",
+        title: "React router - 2",
+      },
+      {
+        id: "tp3",
+        title: "React router - 3",
+      },
+      {
+        id: "tp4",
+        title: "React router - 4",
+      },
+      {
+        id: "tp5",
+        title: "React router - 5",
+      },
+      {
+        id: "tp6",
+        title: "React router - 6",
+      },
+      {
+        id: "t7",
+        title: "React router - 7",
+      },
+    ],
+  },
+  {
+    id: "s9",
+    title: "Authentication",
+    topics: [
+      {
+        id: "tp1",
+        title: "Authentication - 1",
+      },
+    ],
+  },
+];
+
 export default function App() {
   return (
     <>
-      <div>
-        <h1>What is React?</h1>
-      </div>
+      <SectionCard sectionsArray={SECTIONS_ARRAY} />
+    </>
+  );
+}
 
-      <div>
-        <h1>Installation</h1>
-      </div>
-
-      <div>
-        <h1>Basics</h1>
-        <ul>
-          <li>
-            <p>useEffect</p>
-          </li>
-          <li>
-            <p>useState</p>
-          </li>
-          <li>
-            <p>useRef</p>
-          </li>
-          <li>
-            <p>props</p>
-          </li>
-          <li>
-            <p>useCallback</p>
-          </li>
-          <li>
-            <p>contextAPI</p>
-          </li>
-          <li>
-            <p>useReducer</p>
-          </li>
-          <li>
-            <p>useMemo</p>
-          </li>
-          <li>
-            <p>Built-in React components</p>
-          </li>
-          <li>
-            <p>Tips</p>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h1>Styling</h1>
-        <ul>
-          <li>
-            <p>CSS styling</p>
-          </li>
-          <li>
-            <p>styled components</p>
-          </li>
-          <li>
-            <p>Tailwind CSS</p>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h1>Events</h1>
-        <ul>
-          <li>
-            <p>Mouse events</p>
-          </li>
-          <li>
-            <p>Drag events</p>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h1>Advanced</h1>
-        <ul>
-          <li>
-            <p>Class based components</p>
-          </li>
-          <li>
-            <p>Error handling</p>
-          </li>
-          <li>
-            <p>Custom hooks</p>
-          </li>
-          <li>
-            <p>Forms and user inputs</p>
-          </li>
-          <li>
-            <p>Reset user inputs</p>
-          </li>
-          <li>
-            <p>Input validation</p>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h1>Redux</h1>
-        <ul>
-          <li>
-            <p>Redux intro</p>
-          </li>
-          <li>
-            <p>Redux with React - 1</p>
-          </li>
-          <li>
-            <p>Redux with React - 2</p>
-          </li>
-          <li>
-            <p>Redux Toolkit</p>
-          </li>
-          <li>
-            <p>Redux advanced</p>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h1>React router</h1>
-        <ul>
-          <li>
-            <p>React router - 1</p>
-          </li>
-          <li>
-            <p>React router - 2</p>
-          </li>
-          <li>
-            <p>React router - 3</p>
-          </li>
-          <li>
-            <p>React router - 4</p>
-          </li>
-          <li>
-            <p>React router - 5</p>
-          </li>
-          <li>
-            <p>React router - 6</p>
-          </li>
-          <li>
-            <p>React router - 7</p>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h1>Authentication</h1>
-        <ul>
-          <li>
-            <p>Authentication - 1</p>
-          </li>
-        </ul>
-      </div>
+function SectionCard({ sectionsArray }) {
+  return (
+    <>
+      {sectionsArray.map((section) => (
+        <div key={section.id}>
+          <h1>{section.title}</h1>
+          {!!section.topics && (
+            <ul>
+              {section.topics.map((topic) => (
+                <li key={topic.id}>
+                  <p>{topic.title}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
     </>
   );
 }

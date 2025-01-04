@@ -6,7 +6,6 @@ Using Vite to create a application. You need to select 'React' framework and 'Ja
 
 ```
     npm create vite@latest
-
 ```
 
 <br />
