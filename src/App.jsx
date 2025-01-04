@@ -199,13 +199,20 @@ function SectionCard({ sectionsArray }) {
   return (
     <>
       {sectionsArray.map((section) => (
-        <div key={section.id}>
-          <h1>{section.title}</h1>
+        <div
+          key={section.id}
+          className="p-4 m-5 rounded-2xl backdrop-blur-md bg-[#FFFFFF]/15 hover:bg-[#FFFFFF]/45"
+        >
+          <h1 className="font-poiretOneRegular text-6xl mb-4">
+            {section.title}
+          </h1>
           {!!section.topics && (
             <ul>
               {section.topics.map((topic) => (
                 <li key={topic.id}>
-                  <p>{topic.title}</p>
+                  <p className="font-montserrat text-xl text-stone-600 ml-4">
+                    {topic.title}
+                  </p>
                 </li>
               ))}
             </ul>

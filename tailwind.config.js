@@ -2,7 +2,15 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        roboto: ['"Roboto", serif'],
+        dmSerifTextRegular: ['"DM Serif Text", serif'],
+        inriaSerifBold: ['"Inria Serif", serif'],
+        poiretOneRegular: ['"Poiret One", serif'],
+        montserrat: ['"Montserrat", serif'],
+      },
+    },
   },
   plugins: [],
 };
