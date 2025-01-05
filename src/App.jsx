@@ -10,18 +10,25 @@ import AdvancedPage from "./pages/Advanced.jsx";
 import ReduxPage from "./pages/Redux.jsx";
 import ReactRouterPage from "./pages/ReactRouter.jsx";
 import AuthenticationPage from "./pages/Authentication.jsx";
+import RootLayout from "./pages/Root.jsx";
 
 const router = createBrowserRouter([
-  { path: "/", element: <HomePage /> },
-  { path: "/what-is-react", element: <WhatIsReactPage /> },
-  { path: "/installation", element: <InstallationPage /> },
-  { path: "/basics", element: <BasicsPage /> },
-  { path: "/styling", element: <StylingPage /> },
-  { path: "/events", element: <EventsPage /> },
-  { path: "/advanced", element: <AdvancedPage /> },
-  { path: "/redux", element: <ReduxPage /> },
-  { path: "/react-router", element: <ReactRouterPage /> },
-  { path: "/authentication", element: <AuthenticationPage /> },
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: "/what-is-react", element: <WhatIsReactPage /> },
+      { path: "/installation", element: <InstallationPage /> },
+      { path: "/basics", element: <BasicsPage /> },
+      { path: "/styling", element: <StylingPage /> },
+      { path: "/events", element: <EventsPage /> },
+      { path: "/advanced", element: <AdvancedPage /> },
+      { path: "/redux", element: <ReduxPage /> },
+      { path: "/react-router", element: <ReactRouterPage /> },
+      { path: "/authentication", element: <AuthenticationPage /> },
+    ],
+  },
 ]);
 
 export default function App() {
