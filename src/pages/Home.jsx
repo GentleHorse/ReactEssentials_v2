@@ -1,15 +1,20 @@
+import { Link } from "react-router-dom";
+
 const SECTIONS_ARRAY = [
   {
     id: "s1",
     title: "What is React?",
+    path: "/what-is-react",
   },
   {
     id: "s2",
     title: "Installation",
+    path: "/installation",
   },
   {
     id: "s3",
     title: "Basics",
+    path: "/basics",
     topics: [
       {
         id: "tp1",
@@ -56,6 +61,7 @@ const SECTIONS_ARRAY = [
   {
     id: "s4",
     title: "Styling",
+    path: "/styling",
     topics: [
       {
         id: "tp1",
@@ -74,6 +80,7 @@ const SECTIONS_ARRAY = [
   {
     id: "s5",
     title: "Events",
+    path: "/events",
     topics: [
       {
         id: "tp1",
@@ -88,6 +95,7 @@ const SECTIONS_ARRAY = [
   {
     id: "s6",
     title: "Advanced",
+    path: "/advanced",
     topics: [
       {
         id: "tp1",
@@ -118,6 +126,7 @@ const SECTIONS_ARRAY = [
   {
     id: "s7",
     title: "Redux",
+    path: "/redux",
     topics: [
       {
         id: "tp1",
@@ -144,6 +153,7 @@ const SECTIONS_ARRAY = [
   {
     id: "s8",
     title: "React router",
+    path: "/react-router",
     topics: [
       {
         id: "tp1",
@@ -178,6 +188,7 @@ const SECTIONS_ARRAY = [
   {
     id: "s9",
     title: "Authentication",
+    path: "/authentication",
     topics: [
       {
         id: "tp1",
@@ -199,7 +210,8 @@ function SectionCard({ sectionsArray }) {
   return (
     <>
       {sectionsArray.map((section) => (
-        <div
+        <Link
+          to={section.path}
           key={section.id}
           className="p-4 m-5 rounded-2xl backdrop-blur-md bg-[#FFFFFF]/15 hover:bg-[#FFFFFF]/45"
         >
@@ -217,7 +229,7 @@ function SectionCard({ sectionsArray }) {
               ))}
             </ul>
           )}
-        </div>
+        </Link>
       ))}
     </>
   );
