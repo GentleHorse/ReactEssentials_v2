@@ -200,7 +200,7 @@ const SECTIONS_ARRAY = [
 
 export default function HomePage() {
   return (
-    <div className="max-w-[800px] flex flex-col mx-auto">
+    <div className="max-w-[800px] w-3/4 flex flex-col mx-auto">
       <SectionCard sectionsArray={SECTIONS_ARRAY} />
     </div>
   );
