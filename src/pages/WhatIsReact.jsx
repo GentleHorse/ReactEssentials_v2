@@ -1,3 +1,5 @@
+import Card from "../components/UI/Card.jsx";
+
 const CORE_CONCEPTS = [
   {
     id: "cc1",
@@ -47,7 +49,7 @@ export default function WhatIsReactPage() {
 
 function CoreConceptWrapper({ coreConcept }) {
   return (
-    <div className="flex flex-row items-center p-5 rounded-2xl backdrop-blur-md bg-[#FFFFFF]/15">
+    <Card className="flex flex-row items-center p-5 rounded-2xl backdrop-blur-md bg-[#FFFFFF]/15">
       <img src={coreConcept.imgPath} className="w-[300px] h-[300px]" />
       <div>
         <h1 className="font-roboto text-xl m-2">{coreConcept.title}</h1>
@@ -55,6 +57,6 @@ function CoreConceptWrapper({ coreConcept }) {
           {coreConcept.texts}
         </p>
       </div>
-    </div>
+    </Card>
   );
 }
