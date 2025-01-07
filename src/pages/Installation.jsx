@@ -1,6 +1,5 @@
-import Card from "../components/UI/Card.jsx";
-import MonoTextsWrapper from "../components/UI/MonoTextsWrapper.jsx";
 import SectionWrapper from "../components/UI/SectionWrapper.jsx";
+import TopicWrapper from "../components/UI/TopicWrapper.jsx";
 
 const TOPICS_ARRAY = [
   {
@@ -98,20 +97,4 @@ export default function InstallationPage() {
   );
 }
 
-function TopicWrapper({ topics }) {
-  return (
-    <>
-      {topics.map((topic) => (
-        <li key={topic.id}>
-          <h1 className="font-roboto text-xl mx-2 mt-8 mb-2">{topic.title}</h1>
-          <p className="whitespace-pre font-montserrat text-sm text-stone-600 mx-2 mb-4">
-            {topic.text}
-          </p>
-          <Card>
-            <MonoTextsWrapper>{topic.code}</MonoTextsWrapper>
-          </Card>
-        </li>
-      ))}
-    </>
-  );
-}
+

@@ -1,7 +1,148 @@
-const TOPICS_ARRAY = [
+import { useState } from "react";
+import SideBar from "../components/sideBar/SideBar.jsx";
+import TopicWrapper from "../components/UI/TopicWrapper.jsx";
+
+const BASICS_TOPICS_ARRAY = [
   {
     id: "tp1",
     title: "useEffect",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Call at every render",
+        text: `Called at the initial render + every render. 
+(* useEffect execution timing is right after the component is rendered.)`,
+        code: `
+      useEffect(() => {
+        console.log("useEffect is called");
+      });
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Call at initial render only",
+        text: `Called at only the initial render.
+(* useEffect execution timing is right after the component is rendered.)`,
+        code: `
+      useEffect(() => {
+        console.log("useEffect is called");
+      }, []);
+
+
+      /**
+       * 
+       *  the function inside return of useEffect hook gets executed
+       *  when a component is disposed (removed),
+       *  or only when right before the next time useEffect is called
+       * 
+       * / 
+       
+      useEffect(() => {
+        console.log("useEffect is called");
+
+        return () => {
+            console.log("component disposed")
+        }
+      }, []);
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Called at dependency changes",
+        text: `Called at the initial render and everytime depenancies are changed.
+(* useEffect execution timing is right after the component is rendered.)`,
+        code: `
+      /**
+       * 
+       *  As for dependencies, 
+       *  DO NOT PASS FUNCTIONS(S) WIHTOUT USECALLBACK HOOK!
+       *  Normally function objects get newly re-created
+       *  every component renders,
+       *  which triggers infinite loop to crash the app,
+       *  and useCallback hook prevent to re-creating functions.
+       * 
+       * / 
+
+      useEffect(() => {
+        console.log("useEffect is called");
+      }, [a, b]);
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Store in localStorage",
+        text: `Store data in localStorage with useEffect.`,
+        code: `
+      useEffect(() => {
+        localStorage.setItem("count", count);
+      }, [count]);
+
+
+      /**
+       *  Practical usage is below
+       * / 
+
+      import { useEffect, useState } from "react";
+
+      function Clicker() {
+        const [count, setCount] = useState(0);
+
+        // Set the initial value
+        useEffect(() => {
+          const savedCount = parseInt(localStorage.getItem("count") ?? 0);
+          setCount(savedCount);
+        }, []);
+
+        // Update the value
+        useEffect(() => {
+          localStorage.setItem("count", count);
+        }, [count]);
+
+        // Click handler
+        const buttonClick = () => {
+          setCount((value) => value + 1);
+        };
+
+        return (
+          <div>
+            <div>Click count: {count}</div>
+            <button onClick={buttonClick}>Click me</button>
+          </div>
+        );
+      }
+
+      export default Clicker;
+        
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Not execute at the intial render",
+        text: `If you don’t want to run the code at the initial render, 
+define the “isInitial” flag outside the component, 
+and use it to prevent the code from being executed.`,
+        code: `        
+      let isInitial = true;
+
+      export default function SomeComponent() {
+
+        useEffect(() => {
+        
+          if (isInitial){
+            isInitial = false;
+            return;
+          }
+        
+          // ---- some code to execute -----
+        
+        }, [a, b])
+        
+        ....
+
+      }
+        `,
+      },
+    ],
   },
   {
     id: "tp2",
@@ -42,57 +183,37 @@ const TOPICS_ARRAY = [
 ];
 
 export default function BasicsPage() {
+  const [topicId, setTopicId] = useState("tp1");
+  const [topicIndex, setTopicIndex] = useState(0);
+
+  const topicHandler = (topic) => {
+    setTopicId(topic.id);
+
+    const selectedTopicId = BASICS_TOPICS_ARRAY.findIndex(
+      (e) => e.id === topic.id
+    );
+    setTopicIndex(selectedTopicId);
+  };
+
   return (
     <>
       <h1 className="font-poiretOneRegular text-center text-6xl mx-6 mt-8 mb-14">
         Basics
       </h1>
 
-      <SideBar topicsArray={TOPICS_ARRAY} />
+      <section className="grid grid-cols-3">
+        <div>
+          <SideBar
+            topicsArray={BASICS_TOPICS_ARRAY}
+            setTopic={topicHandler}
+            topicId={topicId}
+          />
+        </div>
 
-      
+        <ul className="max-w-[600px] mx-auto">
+          <TopicWrapper topics={BASICS_TOPICS_ARRAY[topicIndex].subTopics} />
+        </ul>
+      </section>
     </>
-  );
-}
-
-function SideBar({ topicsArray }) {
-  return (
-    <aside className="w-1/3 px-8 py-16 bg-stone-400 text-stone-50 md:w-72 rounded-r-xl">
-      <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">
-        Topics
-      </h2>
-      <ul className="mt-8">
-        {topicsArray.map((topic) => {
-          let cssClasses =
-            "w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800";
-          return (
-            <li key={topic.id}>
-              <button className={cssClasses}>{topic.title}</button>
-            </li>
-          );
-        })}
-
-        {/* {projects.map((project) => {
-        let cssClasses = "w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800";
-
-        if (project.id === selectedProjectId){
-          cssClasses += ' bg-stone-800 text-stone-200'
-        } else {
-          cssClasses += ' text-stone-400'
-        }
-
-        return (
-          <li key={project.id}>
-            <button
-              className={cssClasses}
-              onClick={() => onSelectProject(project.id)}
-            >
-              {project.title}
-            </button>
-          </li>
-        );
-      })} */}
-      </ul>
-    </aside>
   );
 }
