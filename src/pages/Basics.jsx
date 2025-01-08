@@ -10,8 +10,7 @@ const BASICS_TOPICS_ARRAY = [
       {
         id: "sbtp1",
         title: "Call at every render",
-        text: `Called at the initial render + every render. 
-(* useEffect execution timing is right after the component is rendered.)`,
+        text: `Called at the initial render + every render. (* useEffect execution timing is right after the component is rendered.)`,
         code: `
       useEffect(() => {
         console.log("useEffect is called");
@@ -21,8 +20,7 @@ const BASICS_TOPICS_ARRAY = [
       {
         id: "sbtp2",
         title: "Call at initial render only",
-        text: `Called at only the initial render.
-(* useEffect execution timing is right after the component is rendered.)`,
+        text: `Called at only the initial render. (* useEffect execution timing is right after the component is rendered.)`,
         code: `
       useEffect(() => {
         console.log("useEffect is called");
@@ -49,8 +47,7 @@ const BASICS_TOPICS_ARRAY = [
       {
         id: "sbtp3",
         title: "Called at dependency changes",
-        text: `Called at the initial render and everytime depenancies are changed.
-(* useEffect execution timing is right after the component is rendered.)`,
+        text: `Called at the initial render and everytime depenancies are changed. (* useEffect execution timing is right after the component is rendered.)`,
         code: `
       /**
        * 
@@ -118,9 +115,7 @@ const BASICS_TOPICS_ARRAY = [
       {
         id: "sbtp5",
         title: "Not execute at the intial render",
-        text: `If you don’t want to run the code at the initial render, 
-define the “isInitial” flag outside the component, 
-and use it to prevent the code from being executed.`,
+        text: `If you don’t want to run the code at the initial render, define the “isInitial” flag outside the component, and use it to prevent the code from being executed.`,
         code: `        
       let isInitial = true;
 
@@ -147,38 +142,218 @@ and use it to prevent the code from being executed.`,
   {
     id: "tp2",
     title: "useState",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Base rule",
+        text: `Calling the set function does not change the current state immediately. It only affects what useState will return starting from the next render.`,
+        code: `
+      const [name, setName] = useState('Taylor');
+
+      function handleClick() {
+        setName('Robin');
+        console.log(name); // Still "Taylor"!
+      }
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Use case: switching tab buttons",
+        text: `Passing an identifier('selectedButton') to clickEventHandler('selectHandler') to control the tab content and css styles by monitoring the selected button.`,
+        code: `
+      App.jsx --------------------------------------------------
+
+      function App() {
+        const [selectedTopic, setSelectedTopic] = useState();
+
+        const selectHandler = (selectedButton) => {
+          setSelectedTopic(selectedButton);
+        };
+
+        ...
+
+        return (
+
+              ...
+
+              <menu>
+                <TabButton
+                  isSelected={selectedTopic === "components"}
+                  onClick={() => selectHandler("components")}
+                >
+                  Components
+                </TabButton>
+                <TabButton
+                  isSelected={selectedTopic === "jsx"}
+                  onClick={() => selectHandler("jsx")}
+                >
+                  JSX
+                </TabButton>
+                <TabButton
+                  isSelected={selectedTopic === "props"}
+                  onClick={() => selectHandler("props")}
+                >
+                  Props
+                </TabButton>
+                <TabButton
+                  isSelected={selectedTopic === "state"}
+                  onClick={() => selectHandler("state")}
+                >
+                  State
+                </TabButton>
+              </menu>
+
+              ...
+
+      TabButton.jsx --------------------------------------------      
+
+      export default function TabButton({ children, onSelect, ...props }) {
+        return (
+          <li>
+            <button className={isSelected ? "active" : undefined} {...props}>
+              {children}
+            </button>
+          </li>
+        );
+      }
+
+      index.css ------------------------------------------------
+
+      #examples menu button.active {
+        background-color: #25d325;
+        color: #e7eaef;
+      }
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Two-way binding",
+        text: `Two-way binding gives components in your application a way to share data. Use two-way binding to listen for events and update values simultaneously between parent and child components.`,
+        code: `
+        
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+      {
+        id: "sbtp5",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+      {
+        id: "sbtp6",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+      {
+        id: "sbtp7",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp3",
     title: "useRef",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp4",
     title: "props",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp5",
     title: "useCallback",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp6",
     title: "contextAPI",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp7",
     title: "useReducer",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp8",
     title: "useMemo",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp9",
     title: "Built-in React components",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
   {
     id: "tp10",
     title: "Tips",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: ``,
+      },
+    ]
   },
 ];
 
