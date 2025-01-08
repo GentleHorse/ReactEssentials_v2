@@ -1,6 +1,6 @@
 export default function SideBar({ topicsArray, setTopic, topicId }) {
   return (
-    <aside className="fixed w-1/5 px-6 py-12 bg-stone-400 text-stone-50 md:w-56 rounded-r-xl">
+    <aside className="fixed w-1/4 px-8 py-12 bg-stone-400 text-stone-50 lg:w-72 rounded-r-xl">
       <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">
         Topics
       </h2>

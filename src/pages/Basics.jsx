@@ -479,7 +479,7 @@ const BASICS_TOPICS_ARRAY = [
         );
         `,
       },
-    ]
+    ],
   },
   {
     id: "tp3",
@@ -487,11 +487,175 @@ const BASICS_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
-        code: ``,
+        title: "Use case: inside useEffect",
+        text: `It lets you reference a value that's not needed for rendering. You can access DOM element ONLY AFTER JSX is rendered (more precisely, the ref connection is created at the second render time), that's why playing inside useEffect (the initial render).`,
+        code: `
+      const buttonRef = useRef();
+
+      useEffect(() => {
+        buttonRef.current.style.backgroundColor = 'papayawhip';
+        buttonRef.current.style.color = 'salmon';
+
+        return () => {
+          localStorage.removeItem(keyName);
+        };
+      }, []);
+
+      ...
+
+      return (
+        ...
+          <button ref={buttonRef} onClick={buttonClick}>
+            Click me
+          </button>
+        ...
+      );        
+      `,
       },
-    ]
+      {
+        id: "sbtp2",
+        title: "Use case: timer",
+        text: `useRef doesn't call re-render the component, so it's good to control the value which doesn't need to be rendered such as starting and stopping a timer.`,
+        code: `
+      const timer = useRef();
+
+      const [timerStarted, setTimerStarted] = useState(false);
+      const [timerExpired, setTimerExpired] = useState(false);
+
+      const startHandler = () => {
+        setTimerStarted(true);
+
+        timer.current = setTimeout(() => {
+          setTimerExpired(true);
+        }, targetTime * 1000);
+      };
+
+      const stopHandler = () => {
+        clearTimeout(timer.current);
+      };
+
+      ...
+
+      <button
+        className={challengeButtonClasses}
+        onClick={timerStarted ? stopHandler : startHandler}
+      >
+        {timerStarted ? "Stop" : "Start"} Chanllenge
+      </button>
+      `,
+      },
+      {
+        id: "sbtp3",
+        title: "Forwarding ref",
+        text: `Call 'forwardRef()' to let your component receive a ref and forward it to a child component.`,
+        code: `
+        Parent component -----------------------------------------
+
+        const dialog = useRef();
+
+        ...
+
+        return (
+          <>
+            <ResultModal ref={dialog} result="lost" targetTime={targetTime} />
+
+
+        Child component ------------------------------------------
+
+        import { forwardRef } from "react";
+
+        const ResultModal = forwardRef(function ResultModal(props, ref) {
+          return (
+            <dialog ref={ref}>
+              
+              ...
+              
+            </dialog>
+          );
+        })
+
+        export default ResultModal;
+      `,
+      },
+      {
+        id: "sbtp4",
+        title: "Exposing function",
+        text: `Creating and exposing a function which can be called from a parent component.`,
+        code: `
+      Parent component -----------------------------------------
+
+      const dialog = useRef();
+
+      ...
+
+      dialog.current.open();
+
+      ...
+
+      return (
+        <>
+          <ResultModal ref={dialog} result="lost" targetTime={targetTime} />
+
+
+      Child component ------------------------------------------
+
+      import { forwardRef, useImperativeHandle, useRef } from "react";
+
+      const ResultModal = forwardRef(function ResultModal({ result, targetTime }, ref) {
+        const dialog = useRef();
+
+        useImperativeHandle(ref, () => {
+          return {
+            open() {
+              dialog.current.showModal();
+            },
+          };
+        });
+
+        return (
+          <dialog ref={dialog} id="result-modal" className={resultModalClasses}>
+          
+          ...      
+
+          </dialog>
+        );
+      });
+
+      export default ResultModal;
+      `,
+      },
+      {
+        id: "sbtp5",
+        title: "Create a portal",
+        text: `To create a portal, call createPortal, passing some JSX, and the DOM node where it should be rendered.`,
+        code: `
+      index.html -----------------------------------------------
+
+      <body>
+        <div id="modal"></div>
+        <div id="content">
+          <div id="root"></div>
+        </div>
+        <script type="module" src="/src/main.jsx"></script>
+      </body>
+
+
+      SomeComponent.jsx ----------------------------------------
+
+      import { createPortal } from "react-dom";
+
+      return createPortal(
+          <dialog>
+
+          ....
+
+          </dialog>,
+
+          document.getElementById("modal")
+        );
+      `,
+      },
+    ],
   },
   {
     id: "tp4",
@@ -503,7 +667,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
   {
     id: "tp5",
@@ -515,7 +679,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
   {
     id: "tp6",
@@ -527,7 +691,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
   {
     id: "tp7",
@@ -539,7 +703,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
   {
     id: "tp8",
@@ -551,7 +715,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
   {
     id: "tp9",
@@ -563,7 +727,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
   {
     id: "tp10",
@@ -575,7 +739,7 @@ const BASICS_TOPICS_ARRAY = [
         text: ``,
         code: ``,
       },
-    ]
+    ],
   },
 ];
 
@@ -607,7 +771,7 @@ export default function BasicsPage() {
           />
         </div>
 
-        <ul className="max-w-[600px] mx-auto">
+        <ul className="col-span-2 max-w-[600px] lg:max-w-[1200px] mr-10 md:mr-12 lg:mr-20">
           <TopicWrapper topics={BASICS_TOPICS_ARRAY[topicIndex].subTopics} />
         </ul>
       </section>
