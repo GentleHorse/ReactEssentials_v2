@@ -907,9 +907,187 @@ const BASICS_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
-        code: ``,
+        title: "How to use",
+        text: `Call createContext outside of any components to create a context, wrap your components into a context provider to specify the value of this context for all components inside and then call useContext at the top level of your component to read and subscribe to context.`,
+        code: `
+      shopping-cart-context.jsx --------------------------------
+
+      import { createContext } from "react";
+
+      export const CartContext = createContext({
+          items: []
+      });
+
+      App.jsx --------------------------------------------------
+
+      import { CartContext } from "./store/shopping-cart-context.jsx";
+
+      function App() {
+        
+        ...
+
+        return (
+          <CartContext.Provider value={{ items: [] }}>
+            
+            ...	
+
+          </CartContext.Provider>
+        );
+      }
+
+      Cart.jsx -------------------------------------------------
+
+      import { useContext } from "react";
+      import { CartContext } from "../../../store/shopping-cart-context";
+
+      ...
+        
+      const cartCtx = useContext(CartContext);
+      `,
+      },
+      {
+        id: "sbtp2",
+        title: "SomeContext.Consumer (Legacy)",
+        text: `Before useContext existed, there was an older way to read context (in this example, you can access the value through variable, cartCtx). Although this older way still works, but newly written code should read context with useContext() instead.`,
+        code: `
+      import { CartContext } from "./store/shopping-cart-context.jsx";
+
+      return (
+        <CartContext.Consumer>
+          {(cartCtx) => {
+              return (
+                <div id="cart">
+      
+                  ...
+      
+                </div>
+            );
+          }
+        </CartContext.Consumer>
+      );        
+      `,
+      },
+      {
+        id: "sbtp3",
+        title: "Link state",
+        text: `In order to link context to state, you need to provide value of context provider with state. (It is better to State be the same format as value of default context for auto completion. In this case, { items: [ ] } ).`,
+        code: `
+      import { CartContext } from "./store/shopping-cart-context.jsx";
+
+      function App() {
+        const [shoppingCart, setShoppingCart] = useState({
+          items: [],
+        });
+
+        ...
+
+        return (
+          <CartContext.Provider value={shoppingCart}>
+            
+            ...	
+
+          </CartContext.Provider>
+        );
+      }
+      `,
+      },
+      {
+        id: "sbtp4",
+        title: "Link state and handlers",
+        text: `You can not only link state value but also its handler functions. In that case, you should update default context value for auto completion.`,
+        code: `
+      shopping-cart-context.jsx --------------------------------
+
+      import { createContext } from "react";
+
+      export const CartContext = createContext({
+          items: [],
+          addItemToCart: () => {},
+          updateItemQuantity: () => {}
+      });
+
+      App.jsx --------------------------------------------------
+
+      import { CartContext } from "./store/shopping-cart-context.jsx";
+
+      function App() {
+        const [shoppingCart, setShoppingCart] = useState({
+          items: [],
+        });
+
+        const itemAddHandler = (id) => {
+          setShoppingCart( ... );
+        };
+
+        const updateCartItemQuantityHandler = (productId, amount) => {
+          setShoppingCart( ... );
+        };
+
+      ...
+
+        const ctxValue = {
+          items: shoppingCart.items,
+          addItemToCart: itemAddHandler,
+          updateItemQuantity: updateCartItemQuantityHandler
+        };
+
+        return (
+          <CartContext.Provider value={ctxValue}>
+
+          ...
+
+          </CartContext.Provider>  
+      `,
+      },
+      {
+        id: "sbtp5",
+        title: "Outsourcing context",
+        text: `You can outsource all context related values and functions by creating a custom context provider wrapper inside the file where context is created and stored.`,
+        code: `
+      export const CartContext = createContext({
+        items: [],
+        addItemToCart: () => {},
+        updateItemQuantity: () => {},
+      });
+
+      export default function CartContextProvider({ children }) {
+        const [shoppingCart, setShoppingCart] = useState({
+          items: [],
+        });
+
+        const itemAddHandler = (id) => {
+          setShoppingCart( ... );
+        };
+
+        const updateCartItemQuantityHandler = (productId, amount) => {
+          setShoppingCart( ... );
+        };
+
+        const ctxValue = {
+          items: shoppingCart.items,
+          addItemToCart: itemAddHandler,
+          updateItemQuantity: updateCartItemQuantityHandler,
+        };
+
+        return (
+          <CartContext.Provider value={ctxValue}>{children}</CartContext.Provider>
+        );
+      }
+
+      ------------------------------
+
+      function App() {
+        return (
+          <CartContextProvider>
+              
+            ...			
+
+          </CartContextProvider>
+        );
+      }
+
+      export default App;
+      `,
       },
     ],
   },
