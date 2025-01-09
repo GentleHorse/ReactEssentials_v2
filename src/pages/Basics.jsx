@@ -1264,9 +1264,23 @@ const BASICS_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
-        code: ``,
+        title: "Suspense",
+        text: `<Suspense> lets you display a fallback until its children have finished loading.`,
+        code: `
+      <Suspense fallback={<Loading />}>
+        <SomeComponent />
+      </Suspense>        
+      `,
+      },
+      {
+        id: "sbtp2",
+        title: "StrictMode",
+        text: `<StrictMode> lets you find common bugs in your components early during development. Behind the scene, <StrictMode> executes wrapped every components twice.`,
+        code: `
+      <StrictMode>
+        <App />
+      </StrictMode>  
+      `,
       },
     ],
   },
