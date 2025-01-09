@@ -663,9 +663,186 @@ const BASICS_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
-        code: ``,
+        title: "Forwarding existing props - id",
+        text: `If you create a wrapper component and want to use it with existing properties such as 'id', 'className' or 'onClick', you have to forward props by using …props to make them available.`,
+        code: `
+      export default function Foo({ title, children, ...props }) {
+        return (
+          <section {...props}>
+            <h2>{title}</h2>
+            {children}
+          </section>
+        );
+      }
+      `,
+      },
+      {
+        id: "sbtp2",
+        title: "Forwarding existing props - onClick",
+        text: `If you create a wrapper component and want to use it with existing properties such as 'id', 'className' or 'onClick', you have to forward props by using …props to make them available.`,
+        code: `
+      export default function Foo({ children, isSelected, ...props }) {
+        return (
+          <li>
+            <button className={isSelected ? "active" : undefined} {...props}>
+              {children}
+            </button>
+          </li>
+        );
+      }         
+      `,
+      },
+      {
+        id: "sbtp3",
+        title: "Creating additional slot in addition to props.child",
+        text: `Adding an additional slot to a wrapper component in addtion to 'props.child', you need to create custom props (in below example, it's 'buttons'). In this way, you can create as much slots as you want.`,
+        code: `
+      App.jsx --------------------------------------------------
+
+      <Tabs
+        buttons={
+          <>
+            <TabButton
+              isSelected={selectedTopic === "components"}
+              onClick={() => selectHandler("components")}
+            >
+              Components
+            </TabButton>
+            <TabButton
+              isSelected={selectedTopic === "jsx"}
+              onClick={() => selectHandler("jsx")}
+            >
+              JSX
+            </TabButton>
+            <TabButton
+              isSelected={selectedTopic === "props"}
+              onClick={() => selectHandler("props")}
+            >
+              Props
+            </TabButton>
+            <TabButton
+              isSelected={selectedTopic === "state"}
+              onClick={() => selectHandler("state")}
+            >
+              State
+            </TabButton>
+          </>
+        }
+      >
+        {tabContent}
+      </Tabs>
+
+      Tabs.jsx -------------------------------------------------
+      
+      export default function Tabs({ children, buttons }) {
+        return (
+          <>
+            <menu>{buttons}</menu>
+            {children}
+          </>
+        );
+      }        
+      `,
+      },
+      {
+        id: "sbtp4",
+        title: "Dynamically change html elements",
+        text: `Dynamically changable html elements to a wrapper component, you have to create custom props starting with a capital letter (in this case, it's 'ButtonsContainer) otherwise React treats it as a built-in html element and couse errors.`,
+        code: `
+      App.jsx --------------------------------------------------
+
+      <Tabs 
+        ButtonsContainer="menu"
+        buttons={
+          <>
+            <TabButton
+              isSelected={selectedTopic === "components"}
+              onClick={() => selectHandler("components")}
+            >
+              Components
+            </TabButton>
+            <TabButton
+              isSelected={selectedTopic === "jsx"}
+              onClick={() => selectHandler("jsx")}
+            >
+              JSX
+            </TabButton>
+            <TabButton
+              isSelected={selectedTopic === "props"}
+              onClick={() => selectHandler("props")}
+            >
+              Props
+            </TabButton>
+            <TabButton
+              isSelected={selectedTopic === "state"}
+              onClick={() => selectHandler("state")}
+            >
+              State
+            </TabButton>
+          </>
+        }
+      >
+        {tabContent}
+      </Tabs>
+
+      Tabs.jsx -------------------------------------------------
+
+      export default function Tabs({ children, buttons, ButtonsContainer = "menu" }) {
+        return (
+          <>
+            <ButtonsContainer>{buttons}</ButtonsContainer>
+            {children}
+          </>
+        );
+      }      
+      `,
+      },
+      {
+        id: "sbtp5",
+        title: "Dynamically change className for css styling",
+        text: `In order to change className dynamically, create a className variable and add className in correspondance to props.`,
+        code: `
+      export default function Button({children, mode="filled", Icon, ...props}) {
+      
+        let cssClasses = "button " + mode + "-button";
+        
+        if (Icon) {
+            cssClasses += ' icon-button'
+        }
+        
+        if (props.className) {
+            cssClasses += ' ' + props.className;
+        }
+      
+        
+        return (
+            <button className={cssClasses} {...props}>
+            {Icon && (
+                <span className="button-icon"><Icon/></span>
+          )}
+            <span>{children}</span>
+            </button>
+            );
+      }        
+      `,
+      },
+      {
+        id: "sbtp6",
+        title: "Gather extra props",
+        text: `If you want to pass many props to children components, sometime it's cumbersome to write all props. Instead you can use '…props' to gather and distribute props properly.`,
+        code: `
+      export default function Input({ id, ...props }) {
+        return (
+          <div .... >
+            <label ...> .... </label>
+            <input id={id} {...props} />
+            
+            ...
+            
+          </div>
+        );
+      }
+      `,
       },
     ],
   },
