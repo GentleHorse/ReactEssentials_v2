@@ -1326,3 +1326,88 @@ export const BASICS_TOPICS_ARRAY = [
     ],
   },
 ];
+
+export const STYLING_TOPICS_ARRAY = [
+  {
+    id: "tp1",
+    title: "",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+
+      `,
+      },
+    ],
+  },
+];
+
+export const ADVANCED_TOPICS_ARRAY = [
+  {
+    id: "tp1",
+    title: "",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+];
+
+export const REDUX_TOPICS_ARRAY = [
+  {
+    id: "tp1",
+    title: "",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+];
+
+export const REACT_ROUTER_TOPICS_ARRAY = [
+  {
+    id: "tp1",
+    title: "",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+];
+
+export const AUTHENTICATION_TOPICS_ARRAY = [
+  {
+    id: "tp1",
+    title: "",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+];

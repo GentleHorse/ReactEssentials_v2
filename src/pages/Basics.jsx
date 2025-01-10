@@ -14,6 +14,8 @@ export default function BasicsPage() {
       (e) => e.id === topic.id
     );
     setTopicIndex(selectedTopicId);
+
+    window.scrollTo(0, 0);   // Move to the top of the page
   };
 
   return (
