@@ -1330,14 +1330,494 @@ export const BASICS_TOPICS_ARRAY = [
 export const STYLING_TOPICS_ARRAY = [
   {
     id: "tp1",
-    title: "",
+    title: "CSS Styling",
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Inline styling",
+        text: `For inline styling, you need to pass value as a format of OBJECT to style property. You can also use ternary expression inside the property.`,
         code: `
+      <input
+        type="email"
+        style={{ backgroundColor: emailNotValid ? '#f87171' : '#d1d5db' }}
+        onChange={(event) => handleInputChange('email', event.target.value)}
+      />
+      `,
+      },
+      {
+        id: "sbtp2",
+        title: "Adding className conditionally",
+        text: `For adding styles from a separated file conditionally to html elements, you need to use BACKTICKS + DOLLAR SIGN.`,
+        code: `
+      <label className={\`label \${emailNotValid ? "invalid" : ""}\`}>Email</label>
+      `,
+      },
+      {
+        id: "sbtp3",
+        title: "CSS modules",
+        text: `Vanilla CSS with file-specific scoping.`,
+        code: `
+      Header.jsx -----------------------------------------------
 
+      import logo from "../assets/logo.png";
+      import classes from "./Header.module.css";
+
+      export default function Header() {
+        return (
+          <header>
+            <img src={logo} alt="A canvas" />
+            <h1>ReactArt</h1>
+            <p className={classes.paragraph}>A community of artists and art-lovers.</p>
+          </header>
+        );
+      }
+
+      Header.module.css ----------------------------------------
+
+      header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      header img {
+        object-fit: contain;
+        margin-bottom: 2rem;
+        width: 11rem;
+        height: 11rem;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.4em;
+        text-align: center;
+        text-transform: uppercase;
+        color: #9a3412;
+        font-family: 'Pacifico', cursive;
+        margin: 0;
+      }
+
+      .paragraph {
+        text-align: center;
+        color: #a39191;
+        margin: 0;
+      }
+
+      @media (min-width: 768px) {
+        header {
+          margin-bottom: 4rem;
+        }
+
+        header h1 {
+          font-size: 2.25rem;
+        }
+      }
+      `,
+      },
+    ],
+  },
+  {
+    id: "tp2",
+    title: "Styled components",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Installation",
+        text: `To download styled-components run:`,
+        code: `
+      npm install styled-components
+      `,
+      },
+      {
+        id: "sbtp2",
+        title: "Use dynamic values",
+        text: `styled-components lets you write actual CSS in your JavaScript and it automatically forwards props, which means you can wrap child elements inside styled-components, add built-in props such as 'className', 'onChange', 'type', etc. You can also dynamically inject values inside styled-components by passing custom props (in below case, it is '$invalid={emailNotValid} & $invalid={passwordNotValid}'). You had better to add '$' in front of custom props when its name conflicts built-in props.`,
+        code: `
+      import { styled } from "styled-components";
+
+      const ControlContainer = styled.div\`
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      \`;
+
+      const Label = styled.label\`
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: \${({ $invalid }) => ($invalid ? "#f87171" : "#6b7280")};
+      \`;
+
+      const Input = styled.input\`
+        width: 100%;
+        padding: 0.75rem 1rem;
+        line-height: 1.5;
+        background-color: \${({ $invalid }) => ($invalid ? "#fed2d2" : "#d1d5db")};
+        color: \${({ $invalid }) => ($invalid ? "#ef4444" : "#374151")};
+        border: 1px solid \${({ $invalid }) => ($invalid ? "#f73f3f" : "transparent")};
+        border-radius: 0.25rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      \`;
+
+      <ControlContainer>
+        <p className="paragraph">
+          <Label $invalid={emailNotValid}>Email</Label>
+          <Input
+            $invalid={emailNotValid}
+            type="email"
+            onChange={(event) => handleInputChange("email", event.target.value)}
+          />
+        </p>
+        <p>
+          <Label $invalid={passwordNotValid}>Password</Label>
+          <Input
+            $invalid={passwordNotValid}
+            type="password"
+            onChange={(event) =>
+              handleInputChange("password", event.target.value)
+            }
+          />
+        </p>
+      </ControlContainer>  
+      `,
+      },
+      {
+        id: "sbtp3",
+        title: "Pseudo Selectors, Nested Rules, Media Queries",
+        text: `For pseudo selectors, nested rules, media queries, you need to replace 'className' with '&'.`,
+        code: `
+      import { styled } from "styled-components";
+
+      import logo from "../assets/logo.png";
+
+      const StyledHeader = styled.header\`
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+
+        & img {
+          object-fit: contain;
+          margin-bottom: 2rem;
+          width: 11rem;
+          height: 11rem;
+        }
+        
+        & h1 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          letter-spacing: 0.4em;
+          text-align: center;
+          text-transform: uppercase;
+          color: #9a3412;
+          font-family: 'Pacifico', cursive;
+          margin: 0;
+        }
+        
+        & p {
+          text-align: center;
+          color: #a39191;
+          margin: 0;
+        }
+        
+        @media (min-width: 768px) {
+          margin-bottom: 4rem;
+        
+          & h1 {
+            font-size: 2.25rem;
+          }
+        }
+      \`;
+
+      export default function Header() {
+        return (
+          <StyledHeader>
+            <img src={logo} alt="A canvas" />
+            <h1>ReactArt</h1>
+            <p>A community of artists and art-lovers.</p>
+          </StyledHeader>
+        );
+      }
+      `,
+      },
+      {
+        id: "sbtp4",
+        title: "Reusable style components",
+        text: `syled-components are components like React components, so you can make it reusable style component.`,
+        code: `
+      App.jsx --------------------------------------------------
+
+      import Button from "./UI/Button.jsx";
+      import Input from "./UI/Input.jsx";
+
+      const ControlContainer = styled.div\`
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      \`;
+
+      ...
+
+      return (
+          <div id="auth-inputs">
+            <ControlContainer>
+              <Input
+                label="Email"
+                invalid={emailNotValid}
+                type="email"
+                onChange={(event) => handleInputChange("email", event.target.value)}
+              />
+              <Input
+                label="Password"
+                invalid={passwordNotValid}
+                type="password"
+                onChange={(event) =>
+                  handleInputChange("password", event.target.value)
+                }
+              />
+            </ControlContainer>
+            <div className="actions">
+              <button type="button" className="text-button">
+                Create a new account
+              </button>
+              <Button onClick={handleLogin}>Sign In</Button>
+            </div>
+          </div>
+        );
+
+      Button.jsx -----------------------------------------------
+
+      import { styled } from "styled-components";
+
+      const Button = styled.button\`
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-radius: 0.25rem;
+        color: #1f2937;
+        background-color: #f0b322;
+        border-radius: 6px;
+        border: none;
+
+        &:hover {
+          background-color: #f0920e;
+        }
+      \`;
+
+      export default Button;
+
+      Input.jsx ------------------------------------------------
+
+      import { styled } from "styled-components";
+
+      const Label = styled.label\`
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: ({$invalid:t})=>t?"#f87171":"#6b7280";
+      \`;
+
+      const Input = styled.input\`
+        width: 100%;
+        padding: 0.75rem 1rem;
+        line-height: 1.5;
+        background-color: ({$invalid:t})=>t?"#fed2d2":"#d1d5db";
+        color: ({$invalid:t})=>t?"#ef4444":"#374151";
+        border: 1px solid ({$invalid:t})=>t?"#f73f3f":"transparent";
+        border-radius: 0.25rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      \`;
+
+      export default function CustomInput({label, invalid, ...props}) {
+          return (
+              <p>
+                  <Label $invalid={invalid} >{label}</Label>
+                  <Input $invalid={invalid} {...props} />
+              </p>
+          );
+      }
+      `,
+      },
+    ],
+  },
+  {
+    id: "tp3",
+    title: "Tailwind CSS",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Installation with Vite",
+        text: `You need to install Tailwind CSS, configure your template paths and add the Tailwind directives to your CSS. It iften requires re-initializing the server.`,
+        code: `
+      terminal -------------------------------------------------
+
+      npm install -D tailwindcss postcss autoprefixer
+      npx tailwindcss init -p
+
+      tailwind.config.js ---------------------------------------
+
+      /** @type {import('tailwindcss').Config} */
+      export default {
+        content: [
+          "./index.html",
+          "./src/**/*.{js,ts,jsx,tsx}",
+        ],
+        theme: {
+          extend: {},
+        },
+        plugins: [],
+      }
+
+      index.css ------------------------------------------------
+
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+      `,
+      },
+      {
+        id: "sbtp2",
+        title: "How to use",
+        text: `You can use tailwind CSS by adding various className.`,
+        code: `
+      <header className="flex flex-col items-center mt-8 mb-16">
+        <img src={logo} alt="A canvas" className="mb-8 w-44 h-44" />
+        <h1 className="
+            text-4xl 
+            font-semibold 
+            tracking-widest 
+            text-center 
+            uppercase 
+            text-amber-800 
+          "
+        >
+          ReactArt
+        </h1>
+        <p className="text-stone-500">
+          A community of artists and art-lovers.
+        </p>
+      </header>
+      `,
+      },
+      {
+        id: "sbtp3",
+        title: "Using custom font",
+        text: `Set up in tailwind.config.js by extending fontFamily property. One-word name should be wrapped with single quotation marks and two-words name should be with double quotation marks. Sometimes it requires re-initializing the server.`,
+        code: `
+      tailwind.config.js ---------------------------------------
+
+      /** @type {import('tailwindcss').Config} */
+      export default {
+        content: [
+          "./index.html",
+          "./src/**/*.{js,ts,jsx,tsx}",
+        ],
+        theme: {
+          extend: {
+            fontFamily: {
+              'roboto': ['"Roboto"', "sans-serif"],
+              "roboto-condensed": ['"Roboto Condensed"', "sans-serif"],
+              "bricolage-grotesque": ['"Bricolage Grotesque"', "sans-serif"],
+              'raleway': ['"Raleway"', "sans-serif"],
+            }
+          },
+        },
+        plugins: [],
+      }
+
+      index.html -----------------------------------------------
+
+      <head>
+        ...
+
+        <link
+          href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+
+      App.jsx --------------------------------------------------
+
+      <h1
+        className="
+          ...
+
+          font-title
+        "
+      >
+        ReactArt
+      </h1>
+      `,
+      },
+      {
+        id: "sbtp4",
+        title: "Media queries",
+        text: `Adding className such as 'sm: ', 'md: ', 'lg: ', 'xl: ', '2xl: '.`,
+        code: `
+      <header className=" ... mb-8 md:mb-16">
+
+      ...
+
+      <h1
+        className="
+          text-xl
+          md:text-4xl 
+          
+          ...
+        "
+      >
+        ReactArt
+      </h1>
+      `,
+      },
+      {
+        id: "sbtp5",
+        title: "Hover state",
+        text: `Adding className 'hover: '.`,
+        code: `
+      <button className=" ... bg-amber-400 hover:bg-amber-500" {...props}>
+        {children}
+      </button>
+      `,
+      },
+      {
+        id: "sbtp6",
+        title: "Dynamic styling",
+        text: `Good use example is feeding classNames based on conditions.`,
+        code: `
+      export default function Input({ label, invalid, ...props }) {
+        let labelClasses = "block mb-2 text-xs font-bold tracking-wide uppercase";
+        let inputClasses = "w-full px-3 py-2 leading-tight border rounded shadow";
+
+        if (invalid) {
+          labelClasses += " text-red-400";
+          inputClasses += " text-red-500 bg-red-100 border-red-300";
+        } else {
+          labelClasses += " text-stone-300";
+          inputClasses += " text-gray-700 bg-stone-300";
+        }
+
+        return (
+          <p>
+            <label className={labelClasses}>{label}</label>
+            <input className={inputClasses} {...props} />
+          </p>
+        );
+      }
       `,
       },
     ],
@@ -1347,7 +1827,77 @@ export const STYLING_TOPICS_ARRAY = [
 export const ADVANCED_TOPICS_ARRAY = [
   {
     id: "tp1",
-    title: "",
+    title: "Class based components",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp2",
+    title: "Error handling",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp3",
+    title: "Custom hooks",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp4",
+    title: "Forms and user inputs",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp5",
+    title: "Reset user inputs",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp6",
+    title: "Input validation",
     subTopics: [
       {
         id: "sbtp1",
@@ -1364,7 +1914,49 @@ export const ADVANCED_TOPICS_ARRAY = [
 export const REDUX_TOPICS_ARRAY = [
   {
     id: "tp1",
-    title: "",
+    title: "Redux intro",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp2",
+    title: "Redux with React - 1",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp3",
+    title: "Redux Toolkit",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp4",
+    title: "Redux advanced",
     subTopics: [
       {
         id: "sbtp1",
@@ -1381,6 +1973,20 @@ export const REDUX_TOPICS_ARRAY = [
 export const REACT_ROUTER_TOPICS_ARRAY = [
   {
     id: "tp1",
+    title: "React router intro",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp2",
     title: "",
     subTopics: [
       {
