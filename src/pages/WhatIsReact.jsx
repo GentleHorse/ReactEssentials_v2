@@ -52,7 +52,7 @@ export default function WhatIsReactPage() {
 
 function CoreConceptWrapper({ coreConcept }) {
   return (
-    <Card className="flex flex-row items-center p-5 rounded-2xl backdrop-blur-md bg-[#FFFFFF]/15">
+    <Card>
       <img src={coreConcept.imgPath} className="w-[30vw] h-[30vw]" />
       <div>
         <h1 className="font-roboto text-xl m-2">{coreConcept.title}</h1>

@@ -214,7 +214,7 @@ function SectionCard({ sectionsArray }) {
         <Link
           to={section.path}
           key={section.id}
-          className="p-4 m-5 rounded-2xl backdrop-blur-md bg-[#FFFFFF]/15 hover:bg-[#FFFFFF]/45"
+          className="p-4 m-5 rounded-2xl backdrop-blur-md bg-[#6E75A4]/15 hover:bg-[#6E75A4]/45"
         >
           <h1 className="font-poiretOneRegular text-6xl mb-4">
             {section.title}
