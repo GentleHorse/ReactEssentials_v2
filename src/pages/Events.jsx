@@ -64,6 +64,52 @@ const MOUSE_EVENTS = [
   },
 ];
 
+const DRAG_EVENTS = [
+  {
+    id: "e1",
+    title: "onDrag",
+    link: "https://www.w3schools.com/jsref/event_ondrag.asp",
+    texts: "An element is being dragged",
+  },
+  {
+    id: "e2",
+    title: "onDragStart",
+    link: "https://www.w3schools.com/jsref/event_ondragstart.asp",
+    texts: "The user starts to drag an element",
+  },
+  {
+    id: "e3",
+    title: "onDragEnd",
+    link: "https://www.w3schools.com/jsref/event_ondragend.asp",
+    texts: "Finished dragging an element",
+  },
+  {
+    id: "e4",
+    title: "onDragEnter",
+    link: "https://www.w3schools.com/jsref/event_ondragenter.asp",
+    texts: "A dragged element enters the drop target",
+  },
+  {
+    id: "e5",
+    title: "onDragLeave",
+    link: "https://www.w3schools.com/jsref/event_ondragleave.asp",
+    texts: "A dragged element leaves the drop target",
+  },
+  {
+    id: "e6",
+    title: "onDragOver",
+    link: "https://www.w3schools.com/jsref/event_ondragover.asp",
+    texts: "A dragged element is over the drop target",
+  },
+  {
+    id: "e7",
+    title: "onDrop",
+    link: "https://www.w3schools.com/jsref/event_ondrop.asp",
+    texts: "A dragged element is dropped on the target",
+  },
+];
+
+
 export default function EventsPage() {
   return (
     <>
@@ -82,6 +128,19 @@ export default function EventsPage() {
           ))}
         </ul>
       </SectionWrapper>
+
+      <h2 className="font-montserrat text-center text-4xl mx-6 my-8 text-stone-500">
+        Drag Events
+      </h2>
+
+      <SectionWrapper>
+        <ul className="list-none flex flex-wrap gap-4">
+          {DRAG_EVENTS.map((event) => (
+            <EventWrapper key={event.id} event={event} />
+          ))}
+        </ul>
+      </SectionWrapper>
+
     </>
   );
 }
