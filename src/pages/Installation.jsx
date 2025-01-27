@@ -84,7 +84,7 @@ You need to select 'React' framework and 'JavaScript' variant.`,
 export default function InstallationPage() {
   return (
     <>
-      <h1 className="font-poiretOneRegular text-center text-6xl mx-6 mt-8 mb-14">
+      <h1 className="font-poiretOneRegular text-right text-9xl mx-6 mt-8 mb-14">
         Installation
       </h1>
 
