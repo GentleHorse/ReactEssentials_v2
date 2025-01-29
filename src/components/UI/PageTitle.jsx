@@ -3,7 +3,7 @@ export default function PageTitle({ children }) {
     <h1
       className="
       sticky top-0 z-10 h-[20vh] 
-      px-6 pb-10 mb-4
+      px-6 pb-10
       border-b-2 border-[#C1C1C1] 
       backdrop-blur-md 
       bg-[#FFFFFF]/15 
