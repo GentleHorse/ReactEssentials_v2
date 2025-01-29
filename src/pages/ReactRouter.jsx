@@ -1,7 +1,12 @@
+import Header from "../components/UI/Header";
+import PageTitle from "../components/UI/PageTitle";
+
 export default function ReactRouterPage() {
-    return (
-      <>
-        <h1>React Router</h1>
-      </>
-    );
-  }
+  return (
+    <>
+      <Header />
+
+      <PageTitle>React Router</PageTitle>
+    </>
+  );
+}

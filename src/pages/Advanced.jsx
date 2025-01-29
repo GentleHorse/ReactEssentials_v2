@@ -1,7 +1,12 @@
+import Header from "../components/UI/Header";
+import PageTitle from "../components/UI/PageTitle";
+
 export default function AdvancedPage() {
-    return (
-      <>
-        <h1>Advanced</h1>
-      </>
-    );
-  }
+  return (
+    <>
+      <Header />
+
+      <PageTitle>Advanced</PageTitle>
+    </>
+  );
+}

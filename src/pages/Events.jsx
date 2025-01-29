@@ -1,12 +1,14 @@
+import Header from "../components/UI/Header.jsx";
 import SectionWrapper from "../components/UI/SectionWrapper.jsx";
 import { MOUSE_EVENTS, DRAG_EVENTS } from "../topics-data.js";
+import PageTitle from "../components/UI/PageTitle.jsx";
 
 export default function EventsPage() {
   return (
     <>
-      <h1 className="font-poiretOneRegular text-right text-9xl mx-6 mt-8 mb-14">
-        Events
-      </h1>
+      <Header />
+
+      <PageTitle>Events</PageTitle>
 
       <h2 className="font-montserrat text-center text-4xl mx-6 my-8 text-stone-500">
         Mouse Events
@@ -31,7 +33,6 @@ export default function EventsPage() {
           ))}
         </ul>
       </SectionWrapper>
-
     </>
   );
 }

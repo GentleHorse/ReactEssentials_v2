@@ -1,7 +1,12 @@
+import Header from "../components/UI/Header";
+import PageTitle from "../components/UI/PageTitle";
+
 export default function AuthenticationPage() {
   return (
     <>
-      <h1>Authentication</h1>
+      <Header />
+
+      <PageTitle>Authentication</PageTitle>
     </>
   );
 }

@@ -1,3 +1,5 @@
+import Header from "../components/UI/Header.jsx";
+import PageTitle from "../components/UI/PageTitle.jsx";
 import SectionWrapper from "../components/UI/SectionWrapper.jsx";
 import TopicWrapper from "../components/UI/TopicWrapper.jsx";
 
@@ -84,9 +86,9 @@ You need to select 'React' framework and 'JavaScript' variant.`,
 export default function InstallationPage() {
   return (
     <>
-      <h1 className="font-poiretOneRegular text-right text-9xl mx-6 mt-8 mb-14">
-        Installation
-      </h1>
+      <Header />
+
+      <PageTitle>Installation</PageTitle>
 
       <SectionWrapper>
         <ul>
@@ -96,5 +98,3 @@ export default function InstallationPage() {
     </>
   );
 }
-
-

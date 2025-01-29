@@ -1,7 +1,12 @@
+import Header from "../components/UI/Header";
+import PageTitle from "../components/UI/PageTitle";
+
 export default function ReduxPage() {
-    return (
-      <>
-        <h1>Redux</h1>
-      </>
-    );
-  }
+  return (
+    <>
+      <Header />
+
+      <PageTitle>Redux</PageTitle>
+    </>
+  );
+}

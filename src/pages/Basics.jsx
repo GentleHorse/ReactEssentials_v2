@@ -2,6 +2,8 @@ import { useState } from "react";
 import SideBar from "../components/sideBar/SideBar.jsx";
 import TopicWrapper from "../components/UI/TopicWrapper.jsx";
 import { BASICS_TOPICS_ARRAY } from "../topics-data.js";
+import Header from "../components/UI/Header.jsx";
+import PageTitle from "../components/UI/PageTitle.jsx";
 
 export default function BasicsPage() {
   const [topicId, setTopicId] = useState("tp1");
@@ -15,14 +17,14 @@ export default function BasicsPage() {
     );
     setTopicIndex(selectedTopicId);
 
-    window.scrollTo(0, 0);   // Move to the top of the page
+    window.scrollTo(0, 0); // Move to the top of the page
   };
 
   return (
     <>
-      <h1 className="font-poiretOneRegular text-right text-9xl mx-6 mt-8 mb-14">
-        Basics
-      </h1>
+      <Header />
+
+      <PageTitle>Basics</PageTitle>
 
       <section className="grid grid-cols-3">
         <div>

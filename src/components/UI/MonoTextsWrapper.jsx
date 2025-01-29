@@ -12,7 +12,7 @@ export default function MonoTextsWrapper({ children }) {
         textAlign: "left",
         fontFamily:
           '"SFMono-Regular", "Menlo", "Consolas", "&quot;PT Mono&quot;", "&quot;Liberation", "Mono&quot;", "Courier", "monospace"',
-        fontSize: "75%",
+        fontSize: "85%",
         tabSize: "2",
         minHeight: "1em",
         color: "rgb(55, 53, 47)",

@@ -1,4 +1,5 @@
 import Card from "../components/UI/Card.jsx";
+import Header from "../components/UI/Header.jsx";
 import SectionWrapper from "../components/UI/SectionWrapper.jsx";
 
 const CORE_CONCEPTS = [
@@ -35,16 +36,18 @@ const CORE_CONCEPTS = [
 export default function WhatIsReactPage() {
   return (
     <>
-      <h1 className="font-poiretOneRegular text-right text-9xl mx-6 mt-8 mb-14">
+      <Header />
+
+      <h1 className="font-poiretOneRegular text-center text-9xl mx-6 mt-8 mb-20">
         What is React?
       </h1>
 
       <SectionWrapper>
-        <section className="flex flex-col gap-6">
+        <ul className="flex flex-col gap-16">
           {CORE_CONCEPTS.map((concept) => (
             <CoreConceptWrapper key={concept.id} coreConcept={concept} />
           ))}
-        </section>
+        </ul>
       </SectionWrapper>
     </>
   );
@@ -52,14 +55,13 @@ export default function WhatIsReactPage() {
 
 function CoreConceptWrapper({ coreConcept }) {
   return (
-    <Card>
-      <img src={coreConcept.imgPath} className="w-[30vw] h-[30vw]" />
+    <li className="w-4/5 mx-auto">
       <div>
-        <h1 className="font-roboto text-xl m-2">{coreConcept.title}</h1>
-        <p className="font-montserrat text-stone-600 mx-4 mb-4">
+        <h1 className="font-roboto text-4xl text-center mb-2">{coreConcept.title}</h1>
+        <p className="font-montserrat text-2xl text-center text-stone-600 mb-4">
           {coreConcept.texts}
         </p>
       </div>
-    </Card>
+    </li>
   );
 }
