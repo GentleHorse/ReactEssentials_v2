@@ -1,5 +1,6 @@
-import Header from "../components/UI/Header";
-import PageTitle from "../components/UI/PageTitle";
+import Header from "../components/UI/Header.jsx";
+import PageTitle from "../components/UI/PageTitle.jsx";
+import ScrollToTopButton from "../components/UI/ScrollToTopButton.jsx";
 
 export default function ReactRouterPage() {
   return (
@@ -7,6 +8,8 @@ export default function ReactRouterPage() {
       <Header />
 
       <PageTitle>React Router</PageTitle>
+
+      <ScrollToTopButton />
     </>
   );
 }

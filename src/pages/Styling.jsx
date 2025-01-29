@@ -5,6 +5,7 @@ import { STYLING_TOPICS_ARRAY } from "../topics-data.js";
 import Header from "../components/UI/Header.jsx";
 import PageTitle from "../components/UI/PageTitle.jsx";
 import TableOfContents from "../components/UI/TableOfContents.jsx";
+import ScrollToTopButton from "../components/UI/ScrollToTopButton.jsx";
 
 export default function StylingPage() {
   const [topicId, setTopicId] = useState("tp1");
@@ -47,6 +48,8 @@ export default function StylingPage() {
           </ul>
         </div>
       </section>
+
+      <ScrollToTopButton />
     </>
   );
 }

@@ -4,6 +4,7 @@ import SectionWrapper from "../components/UI/SectionWrapper.jsx";
 import TopicWrapper from "../components/UI/TopicWrapper.jsx";
 import { INSTALLATION_TOPICS_ARRAY } from "../topics-data.js";
 import TableOfContents from "../components/UI/TableOfContents.jsx";
+import ScrollToTopButton from "../components/UI/ScrollToTopButton.jsx";
 
 export default function InstallationPage() {
   return (
@@ -19,6 +20,8 @@ export default function InstallationPage() {
           <TopicWrapper topics={INSTALLATION_TOPICS_ARRAY} />
         </ul>
       </SectionWrapper>
+
+      <ScrollToTopButton />
     </>
   );
 }

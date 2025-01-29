@@ -2,6 +2,7 @@ import Header from "../components/UI/Header.jsx";
 import SectionWrapper from "../components/UI/SectionWrapper.jsx";
 import { MOUSE_EVENTS, DRAG_EVENTS } from "../topics-data.js";
 import PageTitle from "../components/UI/PageTitle.jsx";
+import ScrollToTopButton from "../components/UI/ScrollToTopButton.jsx";
 
 export default function EventsPage() {
   return (
@@ -33,6 +34,8 @@ export default function EventsPage() {
           ))}
         </ul>
       </SectionWrapper>
+
+      <ScrollToTopButton />
     </>
   );
 }
