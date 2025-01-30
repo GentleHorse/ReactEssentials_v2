@@ -1,11 +1,11 @@
 import { useState } from "react";
 import SideBar from "../components/sideBar/SideBar.jsx";
 import TopicWrapper from "../components/UI/TopicWrapper.jsx";
-import { BASICS_TOPICS_ARRAY } from "../topics-data.js";
 import Header from "../components/UI/Header.jsx";
 import PageTitle from "../components/UI/PageTitle.jsx";
 import TableOfContents from "../components/UI/TableOfContents.jsx";
 import ScrollToTopButton from "../components/UI/ScrollToTopButton.jsx";
+import { BASICS_TOPICS_ARRAY } from "../topics-data.js";
 
 export default function BasicsPage() {
   const [topicId, setTopicId] = useState("tp1");

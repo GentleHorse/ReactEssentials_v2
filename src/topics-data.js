@@ -2109,10 +2109,229 @@ export const ADVANCED_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "What is it?",
+        text: `Class based components are still supported by React, but it is not recommend using them in new code. To define a React component as a class, extend the built-in Component class and define “a render method”. Props are accessible with “this” keywords. In addition, you can not use React hooks with class based components. Here is a comparison to function components.`,
         code: `
-  
+      import { Component } from "react";
+
+      class User extends Component {
+        render() {
+          return <li>{this.props.name}</li>;
+        }
+      }
+
+      export default User;
+
+      -------------------------------------
+
+      const User = (props) => {
+        return <li>{props.name}</li>;
+      };
+
+      export default User;
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "States and handlers",
+        text: `You can not use useState for state management with class based component, thus you need to deal with state management in a different way; constructor(). With class based component, state must be ONE OBJECT and in order to change the value of state, you have to use setState(). This function DOES NOT OVERRIDE state, instead behind the scenes it MERGES old state and new state. When you register the handler function to HTML properties such as onClick(), you MUST USE bind(this) method or arrow function.`,
+        code: `
+      import { Component } from "react";
+
+      const DUMMY_USERS = [ //... ];
+
+      class Users extends Component {
+
+        // 1) state initialization
+        constructor() {
+
+          super();
+
+          this.state = {
+            showUsers: true,
+          };
+
+        }
+
+        // 2) Handler to manage the state
+        toggleUsersHandler() {
+          this.setState((curState) => {
+            return { showUsers: !curState.showUsers };
+          });
+        }
+
+        // 3) Render + pass handler to button click
+        render() {
+          const usersList = (
+            <ul>
+              {DUMMY_USERS.map((user) => (
+                <User key={user.id} name={user.name} />
+              ))}
+            </ul>
+          );
+
+          return (
+            <div>
+              {/* <button onClick={() => this.toggleUsersHandler()}> */}
+              <button onClick={this.toggleUsersHandler.bind(this)}>
+                {this.state.showUsers ? "Hide" : "Show"} Users
+              </button>
+              {this.state.showUsers && usersList}
+            </div>
+          );
+        }
+      }
+
+      ------------------------------------------------------------------
+
+      const Users = () => {
+        const [showUsers, setShowUsers] = useState(true);
+
+        const toggleUsersHandler = () => {
+          setShowUsers((curState) => !curState);
+        };
+
+        const usersList = (
+          <ul>
+            {DUMMY_USERS.map((user) => (
+              <User key={user.id} name={user.name} />
+            ))}
+          </ul>
+        );
+
+        return (
+          <div>
+            <button onClick={toggleUsersHandler}>
+              {showUsers ? "Hide" : "Show"} Users
+            </button>
+            {showUsers && usersList}
+          </div>
+        );
+      };
+
+      export default Users;
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Side effects, replacement functions of useEffect()",
+        text: `With class based components, you cannot use useEffect(). Instead you have to use componentDidMount(): when mounted <——> useEffect(…, []), componentDidUpdate(): when updated <——> useEffect(…, [someValue]), componentWillUnmount(): when destroyed <——> useEffect(() ⇒ { return () ⇒ {}}, []). `,
+        code: `
+      // At initial render
+      componentDidMount() {
+
+        // ... Send http request here, for example ...
+
+        this.setState({ filteredUsers: DUMMY_USERS });
+      }
+
+      // At every target variable change
+      componentDidUpdate(prevProps, prevState) {
+        if (prevState.searchTerm !== this.state.searchTerm) {
+          this.setState({
+            filteredUsers: DUMMY_USERS.filter((user) =>
+              user.name.includes(this.state.searchTerm)
+            ),
+          });
+        }
+      }
+
+      -------------------------------------------------------
+
+      useEffect(() => {
+          setFilteredUsers(
+            DUMMY_USERS.filter((user) => user.name.includes(searchTerm))
+          );
+        }, [searchTerm]);
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Context API",
+        text: `With class based components, you can still use createContext() to create a context and wrap around child components with SomeContext.Provider to enable them to use the context, however you cannot use useContext() inside child components. Instead you need to define the context with “static contextType = SomeContext”. Then you can access the context value by “this.contex.someValue”.`,
+        code: `
+      import { createContext } from "react";
+
+      const UsersContext = createContext({
+        users: [],
+      });
+
+      export default UsersContext;
+
+      ---------------------------------------
+
+      const usersContext = { ... }
+
+      ...
+
+      <UsersContext.Provider value={usersContext}>
+          <UserFinder />
+      </UsersContext.Provider>
+
+      ---------------------------------------
+
+      class UserFinder extends Component {
+
+        static contextType = UsersContext;
+        
+        constructor() { ... }
+        
+        
+        componentDidMount() {
+        
+          this.setState({ filteredUsers: this.context.users });
+        }
+        
+        
+        render() {
+          return (
+            <>
+              <div>
+                <input type="search" />
+              </div>
+              <Users />
+            </>
+          );
+        }
+      }
+
+      export default UserFinder;
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Error boundary",
+        text: `Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed. Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.`,
+        code: `
+      import { Component } from "react";
+
+      class ErrorBoundary extends Component {
+        constructor() {
+          super();
+          this.state = { hasError: false };
+        }
+
+        componentDidCatch(error) {
+          console.log(error)
+          this.setState({ hasError: true });
+        }
+
+        render() {
+          if (this.state.hasError) {
+            return <p>Something went wrong!</p>;
+          }
+
+          return this.props.children;
+        }
+      }
+
+      export default ErrorBoundary;
+
+      ------------------------------------------
+
+      <ErrorBoundary>
+        <Users />
+      </ErrorBoundary>
         `,
       },
     ],
@@ -2123,10 +2342,86 @@ export const ADVANCED_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "With HTTP requests",
+        text: `Error handling is a crucial thing not only in React and here's one typical example of error handling in React applications.`,
         code: `
-  
+      const [isFetching, setIsFetching] = useState(false);
+      const [availablePlaces, setAvailablePlaces] = useState([]);
+      const [error, setError] = useState();
+
+      ....
+
+      useEffect(() => {
+
+          /**
+           * DEFINE THE HTTP REQUEST FUNCTION WITH ERROR HANDLING
+           */
+          async function fetchPlaces() {
+          setIsFetching(true); // Send a signal of "start fetching"
+
+          try {
+              const response = await fetch("http://localhost:3000/places");
+              const resData = await response.json();
+
+              // If fail to send http request
+              if (!response.ok) {
+              throw new Error("Failed to fetch places");
+              }
+
+              setAvailablePlaces(resData.places);
+
+          } catch (error) {
+              setError({
+              message:
+                  error.message || "Could not fetch places, please try again later.",
+              });
+          }
+
+          setIsFetching(false); // Send a signal of "end fetching"
+
+          }
+
+          /**
+           * CALL THE FUNCTION
+           */
+          fetchPlaces();
+
+      }, []);
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Optimistic updating",
+        text: `Updating data with RESTful API might takes time and it's not a good user experience to always show loading state. So here's an example of updating data behind the scene with showing something on UI.`,
+        code: `
+      // Updating user selected places error state
+      const [errorUpdatingPlaces, setErrorUpdatingPlaces] = useState();
+
+      ....
+
+      async function handleSelectPlace(selectedPlace) {
+
+          // 1. Firstly update data on UI
+          setUserPlaces((prevPickedPlaces) => { .... });
+
+          // 2. Behind updating UI, sending PUT request via RESTful API
+          try {
+
+              // The outsourced function in http.js file
+              await updateUserPlaces([selectedPlace, ...userPlaces]);
+
+          } catch (error) {
+
+              // If some errors occur, roll back to previous state
+              // Instead of showing loading state to users
+              setUserPlaces(userPlaces);
+
+              // Set error message
+              setErrorUpdatingPlaces({
+                  message: error.message || "Failed to update places",
+              });
+          }
+      }
         `,
       },
     ],
@@ -2137,10 +2432,111 @@ export const ADVANCED_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "With HTTP requests",
+        text: `By defining your own custom hooks, you can create reusable functions with reusable state management. This means you can use it in multiple components and each time it's in used, it's newly created and its states won't affect other states in other components (they are completely independent). Custom hooks must start with “use” followed by a capital letter. Here's one example of fetching data via HTTP requests. 'fetchFn' is call HTTP requests and fetch data via RESTful API and 'initialValue' is the initial value of response data.`,
         code: `
-  
+      ====> useFetch.js <==================================================
+
+
+      import { useEffect, useState } from "react";
+
+      export function useFetch(fetchFn, initialValue) {
+          const [isFetching, setIsFetching] = useState();
+          const [error, setError] = useState();
+          const [fetchedData, setFetchedData] = useState(initialValue);
+
+          /**
+           * LOAD DATA -------------------------------------------------------
+           */
+          useEffect(() => {
+          // 1. DEFINE THE FUNCTION
+          async function fetchData() {
+              setIsFetching(true); // The signal of start loading
+
+              try {
+              const data = await fetchFn();
+              setFetchedData(data);
+              } catch (error) {
+              setError({ message: error.message || "Failed to fetch data." });
+              }
+
+              setIsFetching(false); // The signal of finish loading
+          }
+
+          // 2. CALL THE FUNCTION
+          fetchData();
+          }, [fetchFn]);
+
+
+          /**
+           * EXPOSED STATES & SET STATE FUNCTIONS ----------------------------
+           */
+          return {
+          isFetching,         // isFetching: isFetching
+          fetchedData,        // fetchedData: fetchedData
+          setFetchedData,     // setFetchedData: setFetchedData
+          error,              // error: error
+          }
+      }
+
+      ====> App.js <=========================================================
+
+      const {
+        isFetching,
+        error,
+        fetchedData: userPlaces,          // alias
+        setFetchedData: setUserPlaces,    // alias
+      } = useFetch(fetchUserPlaces, []);   
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "For user input management",
+        text: `Managing user inputs is more or less similar to any cases, its logics are quite same, and it requires to keep tracks of user inputs with useState().  Thus, it's a nice case for creating a custom hook for that.`,
+        code: `
+      import { useState } from "react";
+
+      export default function useInput(initialValue, validationFn) {
+        /**
+         * State - managing user input
+         */
+        const [enteredValue, setEnteredValue] = useState(initialValue);
+
+        /**
+         * State - tracking editing input
+         */
+        const [didEdit, setDidEdit] = useState(false);
+
+        /**
+         * Validation logic
+         */
+        const valueIsValid = validationFn(enteredValue);
+
+        /**
+         * Handler - tracking input changes
+         */
+        function handleInputChange(event) {
+          setEnteredValue(event.target.value);
+          setDidEdit(false); // Reset editing state
+        }
+
+        /**
+         * Handler - tracking focus or out of focus
+         */
+        function handleInputBlur() {
+          setDidEdit(true);
+        }
+
+        /**
+         * EXPOSE VALUES, FUNCTIONS
+         */
+        return {
+          value: enteredValue,
+          handleInputChange,
+          handleInputBlur,
+          hasError: didEdit && !valueIsValid,
+        };
+      }
         `,
       },
     ],
@@ -2151,10 +2547,212 @@ export const ADVANCED_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Prevent default form submission behaviour",
+        text: `As default in browser, whichever button is clicked inside <form> tag, a HTTP request is automatically sent to the server. Default type of buttons in <form> tag is 'submit', which means, it triggers reloading a page. To prevent page reload, add 'onSubmit' attribute to <form> tag and use 'event.preventDefault()' in the linked handler.`,
         code: `
-  
+      function handleSubmit(event) {
+          event.preventDefault();
+      }
+
+      return (
+          <form onSubmit={handleSubmit}>
+                  
+              ....
+                  
+          </form>
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "One state and one generic handler for user inputs",
+        text: `The more user input are, the more states and handlers are required, which is not ideal for maintaining codes. Thus, it's better to use minimum state managements and handlers, and here's one example.`,
+        code: `
+      const [enteredValues, setEnteredValues] = useState({
+          email: "",
+          password: "",
+      });
+
+      ....
+
+      function handleInputChange(identifier, value) {
+          setEnteredValues((prevValues) => ({
+              ...prevValues,
+              [identifier]: value,
+          }));
+      }
+
+      return (
+          <form onSubmit={handleSubmit}>
+
+                  ....
+
+              <div className="control-row">
+                  <div className="control no-margin">
+                      <label htmlFor="email">Email</label>
+                      <input
+                      id="email"
+                      type="email"
+                      name="email"
+                      onChange={(event) => handleInputChange("email", event.target.value)}
+                      value={enteredValues.email}
+                      />
+                  </div>
+
+                  <div className="control no-margin">
+                      <label htmlFor="password">Password</label>
+                      <input
+                      id="password"
+                      type="password"
+                      name="password"
+                      onChange={(event) =>
+                          handleInputChange("password", event.target.value)
+                      }
+                      value={enteredValues.password}
+                      />
+                  </div>
+              </div>
+
+                  ....
+                  
+          </form>
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "useRef for user inputs",
+        text: `For handling user inputs, one alternative way of two way binding (one state + one generic handler) is using useRef() to create links to input values.`,
+        code: `
+      const emailRef = useRef();
+      const passwordRef = useRef();
+
+      function handleSubmit(event) {
+          event.preventDefault();
+
+          const enteredEmail = emailRef.current.value;
+          const enteredPassword = passwordRef.current.value;
+
+          console.log(enteredEmail, enteredPassword);
+      }
+
+      return (
+          <form onSubmit={handleSubmit}>
+              <h2>Login</h2>
+
+              <div className="control-row">
+                  <div className="control no-margin">
+                  <label htmlFor="email">Email</label>
+                  <input 
+                      id="email" 
+                      type="email" 
+                      name="email" 
+                      ref={emailRef}
+                      />
+                  </div>
+
+                  <div className="control no-margin">
+                  <label htmlFor="password">Password</label>
+                  <input
+                      id="password"
+                      type="password"
+                      name="password"
+                      ref={passwordRef}
+                  />
+                  </div>
+              </div>
+
+              <p className="form-actions">
+                  <button className="button button-flat">Reset</button>
+                  <button className="button">Login</button>
+              </p>
+          </form>
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "FormData object for user inputs",
+        text: `In order to collect user input data, you could use useState() or useRef() for managing it, but it's still cumbersome. A better way is to use “FormData” object. It collects and wraps all user input values inside <form> tag. Be aware, if you want to gather user inputs correctly, you must put “name” attribute to every <input> tag, <select> tag or other input fields. You can withdraw user inputs with Object.fromEntries(fd.entries()).`,
+        code: `
+      function handleSubmit(event) {
+          event.preventDefault();
+          
+          const fd = new FormData(event.target);
+          const acquisitionChannel = fd.getAll("acquisition");  // Get multi selection input
+          const data = Object.fromEntries(fd.entries());
+          data.acquisition = acquisitionChannel; // Merge multi selection input
+          
+          console.log(data);
+          }
+          
+          return (
+              <form onSubmit={handleSubmit}>
+                  
+                  ....
+              
+                  <div>
+                      ....
+                      <input .... name="email" />
+                  </div>
+              
+                  <div>
+                  <div>
+                      ....
+                      <input .... name="password" />
+                  </div>
+              
+                  <div>
+                      ....
+                      <input .... name="confirm-password" />
+                  </div>
+                  </div>
+              
+                  ....
+              
+                  <div>
+                  <div>
+                      ....
+                      <input .... name="first-name" />
+                  </div>
+              
+                  <div>
+                      ....
+                      <input .... name="last-name" />
+                  </div>
+                  </div>
+              
+                  <div>
+                      ....
+                      <select .... name="role">
+                          <option> .... </option>
+                          <option> .... </option>
+                          <option> .... </option>
+                          <option> .... </option>
+                          <option> .... </option>
+                      </select>
+                  </div>
+              
+                  <fieldset>
+                      ....
+                      <div>
+                          <input .... name="acquisition" />
+                          <label htmlFor="a"> .... </label>
+                      </div>
+                  
+                      <div>
+                          <input .... name="acquisition" />
+                          <label htmlFor="b"> .... </label>
+                      </div>
+                      
+                      <div>
+                          <input .... name="acquisition" />
+                          <label htmlFor="c"> .... </label>
+                      </div>
+                  
+                  </fieldset>
+              
+                  ....
+                  
+              </form>
+          );
         `,
       },
     ],
@@ -2165,10 +2763,77 @@ export const ADVANCED_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Built-in reset form logic",
+        text: `If you set 'type' attribute of <button> inside <form> tag to 'reset', it enables to clear user inputs by clicking.`,
         code: `
-  
+      <form onSubmit={handleSubmit}>
+
+          ....
+          
+          <p ....>
+              <button type="reset" ..... >
+                  Reset
+              </button>
+              <button type="submit" .....>
+                  Sign up
+              </button>
+          </p>
+          
+      </form>
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "useState() reset form logic",
+        text: `If you manage user inputs with useState(), you can reset by providing states with the initial values.`,
+        code: `
+      function handleSubmit(event) {
+          event.preventDefault();
+
+          ....
+
+          setEnteredValues({
+              email: "",        // Clear out email input
+              password: "",     // Clear out password input
+          })
+      }
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "useRef() reset form logic",
+        text: `If you manage user inputs with useRef(), you can reset by setting null values.`,
+        code: `
+      function handleSubmit(event) {
+          event.preventDefault();
+
+          const enteredEmail = emailRef.current.value;
+          const enteredPassword = passwordRef.current.value;
+
+          ....
+
+          emailRef.current.value = "";         // Clear out email input
+          passwordRef.current.value = "";      // Clear out password input
+      }
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "FormData reset form logic",
+        text: `If you manage user inputs with FormData, you can reset by reset() method.`,
+        code: `
+      function handleSubmit(event) {
+          event.preventDefault();
+
+          const fd = new FormData(event.target);
+          const acquisitionChannel = fd.getAll("acquisition");  // Get multi selection input
+          const data = Object.fromEntries(fd.entries());
+          data.acquisition = acquisitionChannel; // Merge multi selection input
+
+          ....
+
+          event.target.reset();    // Clear out inputs
+      }
         `,
       },
     ],
@@ -2179,10 +2844,253 @@ export const ADVANCED_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Validate on every keystroke",
+        text: `If you want to validate every keystroke, you need to use useState() for managing user input. In the below example, an error message shows right after a user type a letter in the input box (= right after the user input is not null).`,
         code: `
-  
+      const [enteredValues, setEnteredValues] = useState({
+          email: "",
+          password: "",
+          });
+
+      // Validation
+      const emailIsInvalid =
+          enteredValues.email !== "" && !enteredValues.email.includes("@");
+
+      ....
+
+      // Two-way binding
+      function handleInputChange(identifier, value) {
+          setEnteredValues((prevValues) => ({
+          ...prevValues,
+          [identifier]: value,
+          }));
+      }
+
+      return (
+          <form onSubmit={handleSubmit}>
+              ....
+
+              <div ....>
+                  <div ....>
+                      <label ....> .... </label>
+                      <input
+                          id="email"
+                          type="email"
+                          name="email"
+                          onChange={(event) => handleInputChange("email", event.target.value)}
+                          value={enteredValues.email}
+                      />
+                      <div .... >
+                          {emailIsInvalid && <p>Please enter a valid email address.</p>}
+                      </div>
+                  </div>
+                  
+                  ....   
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Validate on lost focus",
+        text: `If you want to validate once the input loses focus, you need to use onBlur event listener. And for better user experience, you can combine with keystroke validation (in below example, it's done via 'didEdit' state management).`,
+        code: `
+      // State - entered values in the inputs
+      const [enteredValues, setEnteredValues] = useState({
+          email: "",
+          password: "",
+      });
+
+      // State - focus or lose focus
+      const [didEdit, setDidEdit] = useState({
+      email: false,
+      password: false,
+      });
+
+      // Validation - lose focus
+      const emailIsInvalid = didEdit.email && !enteredValues.email.includes("@");
+
+      ....
+
+      // Handler - listen input change + reset 'lose focus' state
+      function handleInputChange(identifier, value) {
+      setEnteredValues((prevValues) => ({
+          ...prevValues,
+          [identifier]: value,
+      }));
+
+      setDidEdit(prevDidEdit => ({
+          ...prevDidEdit,
+          [identifier]: false,
+      }))
+      }
+
+      // Handler - change 'lose focus' state
+      function handleInputBlur(identifier) {
+      setDidEdit((prevDidEdit) => ({
+          ...prevDidEdit,
+          [identifier]: true,
+      }));
+      }
+
+      return (
+          <form .... >
+              ....
+
+              <div .... >
+                  <div .... >
+                      <label .... > .... </label>
+                      <input
+                      id="email"
+                      type="email"
+                      name="email"
+                      onBlur={() => handleInputBlur("email")}
+                      onChange={(event) => handleInputChange("email", event.target.value)}
+                      value={enteredValues.email}
+                      />
+                      <div .... >
+                          {emailIsInvalid && <p>Please enter a valid email address.</p>}
+                      </div>
+                  </div>
+
+                  ....
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Validate on submit",
+        text: `You can validate input data on submitting a form by using useRef().`,
+        code: `
+      // State - valid input or not
+      const [emailIsInvalid, setEmailIsInvalid] = useState(false);
+
+      // Ref - managing the inputs
+      const emailRef = useRef();
+      const passwordRef = useRef();
+
+      // Handler - submit + validation
+      function handleSubmit(event) {
+          event.preventDefault();
+
+          const enteredEmail = emailRef.current.value;
+          const enteredPassword = passwordRef.current.value;
+
+          const emailIsValid = enteredEmail.includes("@");
+
+          if (!emailIsValid) {
+          setEmailIsInvalid(true);  // The email input is invalid
+
+          // Prevent to execute following codes
+          return;
+          }
+
+          // If the email input is valid
+          // change the state for disappearing the error message 
+          setEmailIsInvalid(false);
+      }
+
+      return (
+          <form .... >
+              ....
+
+              <div .... >
+                  <div .... >
+                      <label .... > .... </label>
+                      <input id="email" type="email" name="email" ref={emailRef} />
+                      <div .... >
+                          {emailIsInvalid && <p>Please enter a valid email address.</p>}
+                      </div>
+                  </div>
+              
+              ....
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Validate via built-in props",
+        text: `For user input validations, you can use built-in validation props. You can put ‘required’ attribute to <input> tag and other input field tag such as <select> tag. About password validation, you can also set minmum length by adding 'minLength' attribute.`,
+        code: `
+      <input id="email" type="email" name="email" required />
+
+      <input id="password" type="password" name="password" required minLength={8} />
+
+      <input type="text" id="first-name" name="first-name" required />
+
+      <input type="text" id="last-name" name="last-name" required />
+
+      <select id="role" name="role" required>
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="employee">Employee</option>
+          <option value="founder">Founder</option>
+          <option value="other">Other</option>
+      </select>
+
+      <input type="checkbox" id="terms-and-conditions" name="terms" required />
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Password match logic",
+        text: `Password-match check It's quite normal to ask users to put passwords twice for confirmation, and show a message if two of them don't match with each other. Here's one example of that logic.`,
+        code: `
+      const [passwordAreNotEqual, setPasswordAreNotEqual] = useState(false);
+
+      function handleSubmit(event) {
+          event.preventDefault();
+
+          const fd = new FormData(event.target);
+          const acquisitionChannel = fd.getAll("acquisition"); // Get multi selection input
+          const data = Object.fromEntries(fd.entries());
+          data.acquisition = acquisitionChannel; // Merge multi selection input
+
+          /**
+           *
+           * PASSWORD MATCH LOGIC
+           *
+           * You can access specific data via "name" attribute
+           * "data.confirm-password" is not valid form
+           * thus, use data[confirm-password] instead
+           *
+           */
+          if (data.password !== data[confirm - password]) {
+              setPasswordAreNotEqual(true);
+              return;
+          }
+
+          // If inputs are valid, go to the next action
+          console.log(data);
+      }
+
+      return (
+          <form .... >
+              ....
+
+              <div .... >
+                  <div .... >
+                      <label .... >Password</label>
+                      <input
+                          id="password"
+                          type="password"
+                          name="password"
+                          required
+                          minLength={8}
+                      />
+                  </div>
+
+                  <div .... >
+                      <label .... >Confirm Password</label>
+                      <input
+                          id="confirm-password"
+                          type="password"
+                          name="confirm-password"
+                          required
+                      />
+                  <div .... >
+                      {passwordAreNotEqual && <p>Password must match.</p>}
+                  </div>
+                  </div>
+              </div>
+
+              ....
         `,
       },
     ],
