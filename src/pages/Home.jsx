@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { HOME_SECTIONS_ARRAY } from "../topics-data.js";
-import Header from "../components/UI/Header.jsx";
 
 export default function HomePage() {
   return (
@@ -18,6 +17,9 @@ function SectionCard({ sectionsArray }) {
           to={section.path}
           key={section.id}
           className="p-4 border-t-2 border-[#C1C1C1] text-center hover:bg-[#1C1C1C]"
+          onClick={() => {
+            window.scrollTo(0, 0);
+          }}
         >
           <h1 className="mb-4 font-poiretOneRegular text-6xl text-[#C1C1C1] hover:text-[#FFFFFF]">
             {section.title}
