@@ -10,9 +10,11 @@ export default function TopicWrapper({ topics }) {
           <p className="whitespace-pre text-wrap font-montserrat text-xl text-stone-600 mx-2 mb-8">
             {topic.text}
           </p>
-          <Card>
-            <MonoTextsWrapper>{topic.code}</MonoTextsWrapper>
-          </Card>
+          {!!topic.code && (
+            <Card>
+              <MonoTextsWrapper>{topic.code}</MonoTextsWrapper>
+            </Card>
+          )}
         </li>
       ))}
     </>

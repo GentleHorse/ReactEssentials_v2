@@ -3954,28 +3954,1382 @@ export const REDUX_TOPICS_ARRAY = [
 export const REACT_ROUTER_TOPICS_ARRAY = [
   {
     id: "tp1",
-    title: "React router intro",
+    title: "Intro",
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Multiple pages in SPAs",
+        text: `In Single Page Applications (SPAs) there is only ONE initial HTML request & response, however page (url) cahnges are handled by client-side React code, not by server-side, so visible content is changed without fetching a new HTML file. `,
+      },
+      {
+        id: "sbtp2",
+        title: "Getting started",
+        text: `You need to install the package to use React router.`,
         code: `
-  
+      npm install react-router-dom
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Defining routes",
+        text: `In the root file, use “createBrowserRouter” method and provid it to the “router” attribute of “RouterProvider”.`,
+        code: `
+      import { createBrowserRouter, RouterProvider } from "react-router-dom";
+      import HomePage from "./pages/Home";
+      import ProductsPage from "./pages/Products";
+
+      const router = createBrowserRouter([
+        { path: "/", element: <HomePage /> },
+        { path: "/products", element: <ProductsPage /> },
+      ]);
+
+      function App() {
+        return <RouterProvider router={router} />;
+      }
+
+      export default App;
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Older way of defining routes",
+        text: `In React Router v6.4 or older versions, routes are defined in nested JSX codes with “createRoutesFromElements” method and “Route” components.`,
+        code: `
+      import {
+        createBrowserRouter,
+        createRoutesFromElements,
+        Route,
+        RouterProvider,
+      } from "react-router-dom";
+      import HomePage from "./pages/Home";
+      import ProductsPage from "./pages/Products";
+
+      const routesDefinitions = createRoutesFromElements(
+        <Route>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+        </Route>
+      );
+
+      const router = createBrowserRouter(routesDefinitions);
+
+      function App() {
+        return <RouterProvider router={router} />;
+      }
+
+      export default App;
         `,
       },
     ],
   },
   {
     id: "tp2",
-    title: "",
+    title: "Link and NavLink",
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Navigating between pages with Links",
+        text: `With using “Link” component, you can jump to other pages WITHTOUT sending http request to the server (prevent from reloading the whole application again). Note that “Link” only works INSIDE RouterProvider component.`,
         code: `
-  
+      import { Link } from "react-router-dom";
+
+      function HomePage() {
+      return (
+        <>
+          <h1>My Home Page</h1>
+          <p>
+            Go to <Link to="/products">the list of products</Link>.
+          </p>
+        </>
+      );
+      }
+
+      export default HomePage;
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Layouts and nested routes",
+        text: `To wrap multiple pages, to apply general styling or to implement navigation elements with page links, it’s a pretty standard approach to create “general layout” component and then wrap routes with the “children” attribute. “Outlet” component is the marker of where children components get rendered.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          children: [
+            { path: "/", element: <HomePage /> },
+            { path: "/products", element: <ProductsPage /> },
+          ],
+        },
+      ]);
+
+      // Root.js --------------------------------------------------------------
+
+      import { Outlet } from "react-router-dom";
+      import MainNavigation from "../components/MainNavigation";
+
+      function RootLayout() {
+        return (
+          <>
+            <MainNavigation />
+            <Outlet /> 
+          </>
+        );
+      }
+
+      export default RootLayout;
+
+      // MainNavigation.js ----------------------------------------------------
+
+      import { Link } from "react-router-dom";
+
+      function MainNavigation() {
+        return (
+          <header>
+            <nav>
+              <ul>
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/products">Products</Link>
+                </li>
+              </ul>
+            </nav>
+          </header>
+        );
+      }
+
+      export default MainNavigation;
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Showing error page",
+        text: `In case the user accidentally entered a wrong url, prepare the error page with “errorElement”. `,
+        code: `
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          errorElement: <ErrorPage />,
+          children: [
+            { path: "/", element: <HomePage /> },
+            { path: "/products", element: <ProductsPage /> },
+          ],
+        },
+      ]);
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Navigation links",
+        text: `In “NavLink” component, className can receive a function which can conditionally set the className based on “isActive” prop. As default, className is applied to child elements, so the “end” attribute needs to be set.`,
+        code: `
+      // MainNavigation.js ----------------------------------------------------
+
+      <header className={classes.header}>
+        <nav>
+          <ul className={classes.list}>
+            <li>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? classes.active : undefined
+                }
+                end
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/products"
+                className={({ isActive }) =>
+                  isActive ? classes.active : undefined
+                }
+              >
+                Products
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      // MainNavigation.module.css --------------------------------------------
+
+      .list a:hover,
+      .list a.active {
+        color: var(--color-primary-900);  /* css variable */
+        text-decoration: underline;
+        font-weight: bold;
+      }
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp3",
+    title: "Navigation and routing",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Navigating programmatically",
+        text: `In some situcations, you might want to trigger some navigation actions (switching pages) inside components like after sending the form or a certain time passes. This can be done with the “useNavigate” method.`,
+        code: `
+      import { useNavigate } from "react-router-dom";
+
+      function HomePage() {
+        const navigate = useNavigate();
+
+        function navigateHandler() {
+          navigate("/products");
+        }
+
+        return (
+          <>
+            
+            ....
+            
+            <p>
+              <button onClick={navigateHandler}>Navigate</button>
+            </p>
+          </>
+        );
+      }
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Dynamic routes",
+        text: `You can set routes dynamically by using “colon + any value” in a path (in the below example, it’s “:productId”), which is technically a placeholder. “useParams” returns params objects which contains every dynamic path segments, so you can load different page based on your custom values in the path.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          errorElement: <ErrorPage />,
+          children: [
+            
+            ....
+            
+            { path: "/products/:productId", element: <ProductDetailPage /> },
+          ],
+        },
+      ]);
+
+      // Products.js ----------------------------------------------------------
+
+      import { Link } from "react-router-dom";
+
+      const PRODUCTS = [
+        { id: "p1", title: "Product 1" },
+        { id: "p2", title: "Product 2" },
+        { id: "p3", title: "Product 3" },
+      ];
+
+      function ProductsPage() {
+        return (
+          <>
+            <h1>The Product Page</h1>
+            <ul>
+              {PRODUCTS.map((product) => (
+                <li key={product.id}>
+                  <Link to={\`/products/\${product.id}\`}>
+                    {product.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        );
+      }
+
+      export default ProductsPage;
+
+      // ProductDetail.js -----------------------------------------------------
+
+      import { useParams } from "react-router-dom";
+
+      function ProductDetailPage() {
+        const params = useParams();
+
+        return (
+          <>
+            
+            ....
+            
+            <p>{params.productId}</p>
+          </>
+        );
+      }
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Relative path vs absolute path",
+        text: `Defining paths in a relative way (WITHOUT slash symbol) means following paths are appended after the CURRENT ACTIVE path. In the below example, HomePage url is “/root/”, ProductPage url is “/root/products/”, and ProductDetailPage url is “/root/products/p1”, “/root/products/p2”, “/root/products/p3”. To move up one level with the “Link” component, set “to” attribute to “..” & “relative” attribute to “path” (as default, it’s “route”).`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      const router = createBrowserRouter([
+        {
+          path: "/root",
+          element: <RootLayout />,
+          errorElement: <ErrorPage />,
+          children: [
+            { path: "", element: <HomePage /> },
+            { path: "products", element: <ProductsPage /> },
+            { path: "products/:productId", element: <ProductDetailPage /> },
+          ],
+        },
+      ]);
+
+      // Products.js ----- /root/products -------------------------------------
+
+      import { Link } from "react-router-dom";
+
+      const PRODUCTS = [
+        { id: "p1", title: "Product 1" },
+        { id: "p2", title: "Product 2" },
+        { id: "p3", title: "Product 3" },
+      ];
+
+      function ProductsPage() {
+        return (
+          <>
+            <h1>The Product Page</h1>
+            <ul>
+              {PRODUCTS.map((product) => (
+                <li key={product.id}>
+                  <Link to={product.id}>
+                    {product.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        );
+      }
+
+      export default ProductsPage;
+
+      // ProductDetail.js ----- /root/products/:productId ---------------------
+
+      <p>
+        <Link to=".." relative="path">Back</Link>
+      </p>
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Index routes",
+        text: `Defining the default route, use the “index” attribute.`,
+        code: `
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          errorElement: <ErrorPage />,
+          children: [
+            { index: true, element: <HomePage /> },
+            
+            ....
+            
+          ],
+        },
+      ]);  
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp4",
+    title: "Fetch and load data",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Data fetching with a loader()",
+        text: `By adding the “loader” function to the route, the “loader” function will be executed just before the route is about to be visited (meaning just before the page component which is provided to the “element” attribute gets rendered). Any data which is returned by the function is available in components. In order to access that returned data, use “useLoaderData”. “useLoaderData” returns the loader data for the nearest ancestor Route loader. The data can be accessed inside LOWER routes and components which are used inside these routes, NOT HIGHER level routes.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      ....
+
+      {
+        index: true,
+        element: <EventsPage />,
+        loader: async () => {
+          const response = await fetch("http://localhost:8080/events");
+
+          if (!response.ok) {
+
+            // ..... error handling
+
+          } else {
+            const resData = await response.json();
+
+            return resData.events;   // Returns promise
+          }
+        },
+      },
+
+      ....
+
+      // Events.js ------------------------------------------------------------
+
+      import { useLoaderData } from "react-router-dom";
+      import EventsList from "../components/EventsList.js";
+
+      function EventsPage() {
+        const events = useLoaderData();
+
+        return <EventsList events={events} />;
+      }
+
+      export default EventsPage;
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Store the loader() code inside the component",
+        text: `It’s a common senario to store loader() code inside the component and exported it to the components where it’s set to the “loader” function of the route.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import EventsPage, { loader as eventsLoader } from "./pages/Events.js";
+
+      ....
+
+      {
+        index: true,
+        element: <EventsPage />,
+        loader: eventsLoader
+      },
+
+      ....
+
+      // Events.js ------------------------------------------------------------
+
+      import { useLoaderData } from "react-router-dom";
+      import EventsList from "../components/EventsList.js";
+
+      /**
+       * EVENTS PAGE
+       */
+      function EventsPage() {
+        const events = useLoaderData();
+
+        return <EventsList events={events} />;
+      }
+
+      export default EventsPage;
+
+      /**
+       * LOADER FUNCTION
+       */
+      export async function loader() {
+        const response = await fetch("http://localhost:8080/events");
+
+          if (!response.ok) {
+            // ..... error handling
+          } else {
+            const resData = await response.json();
+        
+            return resData.events;
+          }
+        }
+
+      }
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Fetching the route action state",
+        text: `“useNavigation” returns a navigation object which has a property to access the route action state such as “idle”, “loading”, “submitting”. Note that the loading indicator will NOT BE ADDED ON THE PAGE A USER IS CURRENTLY TRANSITIONIONG TO.`,
+        code: `
+      import { useNavigation } from "react-router-dom";
+
+      function RootLayout() {
+
+        const navigation = useNavigation();  // navitation object
+
+        return (
+          <>
+            ....
+
+            <main>
+            
+              {navigation.state === 'loading' && <p>Loading ..... </p>}
+
+              ....
+              
+              
+            </main>
+          </>
+        );
+      }
+
+      export default RootLayout;
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Returning Response object in loader()",
+        text: `You can return anything inside the loader function so that “Response” objects can be returned (in the below code, “response” is the Response object). Behind the scene, the react router handles properly extracting data from a returned Promise and that’s why you don’t need to use the “json()” method of Response to extract data manually.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import EventsPage, { loader as eventsLoader } from "./pages/Events.js";
+
+      ....
+
+      {
+        index: true,
+        element: <EventsPage />,
+        loader: eventsLoader
+      },
+
+      ....
+
+      // Events.js ------------------------------------------------------------
+
+      import { useLoaderData } from "react-router-dom";
+      import EventsList from "../components/EventsList.js";
+
+      /**
+       * EVENTS PAGE
+       */
+      function EventsPage() {
+        const data = useLoaderData(); // fetch all data in Promise
+        const events = data.events; // extract the events data
+
+        return <EventsList events={events} />;
+      }
+
+      export default EventsPage;
+
+      /**
+       * LOADER FUNCTION
+       */
+      export async function loader() {
+        const response = await fetch("http://localhost:8080/events");
+
+        if (!response.ok) {
+          // ..... error handling
+        } else {
+          return response; // returns Promise (Response object)
+        }
+      } 
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Generic error handling",
+        text: `By creating the generic error page and set to the “errorElement” attribute of the root route, you can handle errors in a generic way. “useRouteError()” returns the nearest ancestor Route error, which could be a loader/action error or a render error. This is intended to be called from your ErrorBoundary/errorElement to display a proper error message. “json()” creates a Response object including data in the JSON format.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      ....
+
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          errorElement: <ErrorPage />,
+          
+          ....
+          
+        },
+      ]);
+
+      ....
+
+      // Error.js -------------------------------------------------------------
+
+      import { useRouteError } from "react-router-dom";
+      import MainNavigation from "../components/MainNavigation.js";
+      import PageContent from "../components/PageContent.js";
+
+      function ErrorPage() {
+        // Fetch route error 
+        const error = useRouteError();
+
+        // Title & message
+        let title = "An error occurred!";
+        let message = "Something went wrong!";
+
+        // Server error (throwed by the loader function in Events.js)
+        if (error.status === 500) {
+          message = error.data.message;
+        }
+
+        // Default error status set by react router
+        if (error.status === 404) {
+          title = "Not found!";
+          message = "Could not find resource or page.";
+        }
+
+        return (
+          <>
+            <MainNavigation />
+
+            <PageContent title={title}>
+              <p>{message}</p>
+            </PageContent>
+          </>
+        );
+      }
+
+      export default ErrorPage;
+
+      // Events.js ------------------------------------------------------------
+
+      import { json } from "react-router-dom";
+
+      ....
+
+      export async function loader() {
+        const response = await fetch("http://localhost:8080/events");
+
+        if (!response.ok) {
+          throw json({ message: "Could not fetch events." }, { status: 500 });
+        } else {
+          return response; // returns Promise (Response object)
+        }
+      }
+        `,
+      },
+      {
+        id: "sbtp6",
+        title: "Fetch data of dynamic routes",
+        text: `To fetch data of dynamic routes with “loader” function, you need to access dynamic segments (starting with “:” symbol). The “loader” function can accept two elements: “request” & “params” and with “params”, you can access it.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import EventDetailPage, { loader as eventDetailLoader } from "./pages/EventDetail.js";
+
+      ....
+
+        {
+          path: ":eventId",
+          element: <EventDetailPage />,
+          loader: eventDetailLoader,
+        },
+        
+      ....
+
+
+      // EventDetail.js -------------------------------------------------------
+
+      import { json, useLoaderData } from "react-router-dom";
+      import EventItem from "../components/EventItem.js";
+
+      /**
+       * EVENT DETAIL PAGE
+       */
+      function EventDetailPage() {
+        const data = useLoaderData();
+        const event = data.event;
+
+        return <EventItem event={event} />;
+      }
+
+      export default EventDetailPage;
+
+      /**
+       * LOADER FUNCTION
+       */
+      export async function loader({ request, params }) {
+        const id = params.eventId;    // access the dynamic segment
+
+        const response = await fetch("http://localhost:8080/events/" + id);
+
+        if (!response.ok) {
+          throw json(
+            { message: "Could not fetch details for selected events." },
+            { status: 500 }
+          );
+        } else {
+          return response;
+        }
+      }
+        `,
+      },
+      {
+        id: "sbtp7",
+        title: "Share a loader by muliplte routes",
+        text: `By setting loaders in root routes, loaders can be shared by multiple routes (in the below example, “eventDetailLoader”). However you cannot access that data with “useLoaderData” hook because the loader function is set at the higher route. In that case, you have to set the “id” attribute of the root route and use “useRouteLoaderData” to fetch data.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      ....
+
+        {
+          path: ":eventId",
+          id: "event-detail",
+          loader: eventDetailLoader,
+          children: [
+            {
+              index: true,
+              element: <EventDetailPage />,
+            },
+            { path: "edit", element: <EditEventPage /> },
+          ],
+        },
+
+      .....
+
+      // EventDetail.js & EditEvent.js ----------------------------------------
+
+      ....
+
+        const data = useRouteLoaderData("event-detail");
+        const event = data.event;
+
+      ....
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp5",
+    title: "Submitting data",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Data submission with <Form> & action()",
+        text: `On working with action() functions, you need to make sure that all inputs have “name” attributes and they are wrapped with the “Form” element which react-router-dom provides. In the “Form” element, you need to specify the method (in the below example, it’s “post”). “Form” element doesn’t send the data immediately to the backend, instead send it to the ACTION (meaning that it triggers the action function).`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import NewEventPage, { action as newEventAction } from "./pages/NewEvent.js";
+
+      ....
+
+        { path: "new", element: <NewEventPage />, action: newEventAction },
+
+      ....
+
+      // NewEvent.js ----------------------------------------------------------
+
+      import { json, redirect } from "react-router-dom";
+      import EventForm from "../components/EventForm.js";
+
+      /**
+       * NEW EVENT PAGE
+       */
+      function NewEventPage() {
+        return <EventForm />;
+      }
+
+      export default NewEventPage;
+
+      /**
+       * ACTION FUNCTION
+       */
+      export async function action({ request, params }) {
+        // 1. Receive entered data in the <Form>
+        const data = await request.formData();
+
+        // 2. Prepare sending data
+        const eventData = {
+          title: data.get("title"),
+          image: data.get("image"),
+          date: data.get("date"),
+          description: data.get("description"),
+        };
+
+        // 3. Post data
+        const response = await fetch("http://localhost:8080/events", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        });
+
+        // 4. Error handing
+        if (!response.ok) {
+          throw json({ message: "Could not save event." }, { status: 500 });
+        }
+
+        // 5. Redirect to home 
+        return redirect("/");
+      }
+
+      // EventForm.js ---------------------------------------------------------
+
+      import { Form } from "react-router-dom";
+
+      import classes from "./EventForm.module.css";
+
+      function EventForm({ method, event }) {
+
+        return (
+          <Form method="post" className={classes.form}>
+            <p>
+              <label htmlFor="title">Title</label>
+              <input
+                id="title"
+                type="text"
+                name="title"
+                required
+                defaultValue={event ? event.title : ""}
+              />
+            </p>
+            <p>
+              <label htmlFor="image">Image</label>
+              <input
+                id="image"
+                type="url"
+                name="image"
+                required
+                defaultValue={event ? event.image : ""}
+              />
+            </p>
+            <p>
+              <label htmlFor="date">Date</label>
+              <input
+                id="date"
+                type="date"
+                name="date"
+                required
+                defaultValue={event ? event.date : ""}
+              />
+            </p>
+            <p>
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                rows="5"
+                required
+                defaultValue={event ? event.description : ""}
+              />
+            </p>
+            <div className={classes.actions}>
+              <button type="button" onClick={cancelHandler}>
+                Cancel
+              </button>
+              <button>Save</button>
+            </div>
+          </Form>
+        );
+      }
+
+      export default EventForm;
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Submitting data in a imperative way",
+        text: `The “Form” element which react-router-dom provides automatically triggers the action function but there is another way of triggering the action. “useSubmit” lets programmers to do so manually thus it’s useful for example when it comes to implement a confirmation step just before submitting the data. In below example, the action function is defined in the “EventDetail.js” file and triggered by “startDeleteHandler”  in the “EventItem.js” file.  In the “EventItem.js” file,  “submit” function which is created by “useSubmit” method receives the “delete” method, and it’s passed to the action function in the “EventDetail.js” file with “request.method”.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import EventDetailPage, { action as deleteEventAction } from "./pages/EventDetail.js";
+
+      ....
+
+        {
+          index: true,
+          element: <EventDetailPage />,
+          action: deleteEventAction,
+        },
+
+
+      // EventDetail.js -------------------------------------------------------
+
+      ....
+
+      export async function action({ params, request }) {
+        const eventId = params.eventId;
+        const response = await fetch("http://localhost:8080/events/" + eventId, {
+          method: request.method
+        });
+
+        if (!response.ok) {
+          throw json({ message: "Could not delete event." }, { status: 500 });
+        }
+
+        return redirect("/");
+      }
+
+      // EventItem.js ---------------------------------------------------------
+
+      import { useSubmit } from "react-router-dom";
+
+      import classes from "./EventItem.module.css";
+
+      function EventItem({ event }) {
+        const submit = useSubmit();
+
+        function startDeleteHandler() {
+          const proceed = window.confirm("Are you sure?");
+
+          if (proceed) {
+            submit(null, { method: "delete" });  // triggers the action
+          }
+        }
+
+        return (
+
+            ....
+
+              <button onClick={startDeleteHandler}>Delete</button>
+            
+            ....
+        );
+      }
+
+      export default EventItem;
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Reflect submission status to UI",
+        text: `Show submission status in UI and disable buttons while submitting data with “useNavigation” hook.`,
+        code: `
+      import { Form, useNavigation } from "react-router-dom";
+
+      function EventForm({ method, event }) {
+
+        // Check status - "submitting"
+        const navigation = useNavigation();
+        const isSubmitting = navigation.state === "submitting";
+
+        return (
+          <Form method="post".... >
+            
+            ....
+            
+
+              <button .... disabled={isSubmitting}>
+                Cancel
+              </button>
+              
+              <button disabled={isSubmitting}>
+                {isSubmitting ? "Submitting ...." : "Save"}
+              </button>
+              
+              ....
+
+          </Form>
+        );
+      }
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Output validation errors",
+        text: `It’s often a good practice to show validation errors just after a user tries to submit data WITHOUT directing to the error page.  “useActionData” hook returns the action data for the nearest ancestor Route action. In the below example, input validation error is defined on backend under the status code 422.`,
+        code: `
+      // NewEvent.js ----------------------------------------------------------
+
+      export async function action({ request, params }) {
+        // 1. Receive entered data in the <Form>
+        const data = await request.formData();
+
+        // 2. Prepare sending data
+        const eventData = {
+          title: data.get("title"),
+          image: data.get("image"),
+          date: data.get("date"),
+          description: data.get("description"),
+        };
+
+        // 3. Post data
+        const response = await fetch("http://localhost:8080/events", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        });
+
+        // 4. Custom error defined in events.js in the backend folder
+        if (response.status === 422){
+          return response;
+        }
+
+        // 5. Error handing
+        if (!response.ok) {
+          throw json({ message: "Could not save event." }, { status: 500 });
+        }
+
+        // 6. Redirect to events 
+        return redirect("/events");
+      }
+
+
+      // EventForm.js ---------------------------------------------------------
+
+      import { useActionData } from "react-router-dom";
+
+      function EventForm({ method, event }) {
+
+        // Data from the route action (in NewEvents.js)
+        const data = useActionData();
+
+        ....
+
+        return (
+          <Form .... >
+            {data && data.errors && (
+              <ul>
+                {Object.values(data.errors).map((err) => (
+                  <li key={err}>{err}</li>
+                ))}
+              </ul>
+            )}
+
+            ....
+            
+          </Form>
+        );
+      }
+
+      // event.js (dummy backend) ---------------------------------------------
+
+      ....
+
+      router.post("/", async (req, res, next) => {
+        const data = req.body;
+
+        let errors = {};
+
+        if (!isValidText(data.title)) {
+          errors.title = "Invalid title.";
+        }
+
+        if (!isValidText(data.description)) {
+          errors.description = "Invalid description.";
+        }
+
+        if (!isValidDate(data.date)) {
+          errors.date = "Invalid date.";
+        }
+
+        if (!isValidImageUrl(data.image)) {
+          errors.image = "Invalid image.";
+        }
+
+        if (Object.keys(errors).length > 0) {
+          return res.status(422).json({
+            message: "Adding the event failed due to validation errors.",
+            errors,
+          });
+        }
+
+        try {
+          await add(data);
+          res.status(201).json({ message: "Event saved.", event: data });
+        } catch (error) {
+          next(error);
+        }
+      });
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Reusing actions",
+        text: `If an app has functions of both submitting new data & modifying existing data, there is probably a chance to utilize a data submitting action and let it used both for “POST” & “PATCH” http requests. In the below example, the utilized action function is defined in the “EventForm.js” file and used for both “new” event route & “edit” event route.  Note that the action which is reused ans shared by multiple routes MUST BE DEFINED INSIDE the component which is used in these routes. In the below case, it’s the EventForm component.`,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import { action as manipulateEventAction } from "./components/EventForm.js";
+
+        ....
+        
+          {
+            path: ":eventId",
+            id: "event-detail",
+            loader: eventDetailLoader,
+            children: [
+              
+              ....
+              
+              {
+                path: "edit",
+                element: <EditEventPage />,
+                action: manipulateEventAction,
+              },
+            ],
+          },
+          {
+            path: "new",
+            element: <NewEventPage />,
+            action: manipulateEventAction,
+          },
+        
+        ....
+        
+      // EventForm.js ---------------------------------------------------------
+        
+      export async function action({ request, params }) {
+        // 1. Receive method & entered data in the <Form>
+        const method = request.method;
+        const data = await request.formData();
+
+        // 2. Prepare sending data
+        const eventData = {
+          title: data.get("title"),
+          image: data.get("image"),
+          date: data.get("date"),
+          description: data.get("description"),
+        };
+
+        // 3. Submit data - POST / PATCH
+        let url = "http://localhost:8080/events/";
+
+        if (method === "PATCH"){
+          const eventId = params.eventId;
+          url += eventId;
+        }
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        });
+
+        // 4. Custom error defined in events.js in the backend folder
+        if (response.status === 422) {
+          return response;
+        }
+
+        // 5. Default error handing
+        if (!response.ok) {
+          throw json({ message: "Could not save event." }, { status: 500 });
+        }
+
+        // 6. Redirect to events
+        return redirect("/events");
+      }
+
+      // NewEvent.js ----------------------------------------------------------
+
+      import EventForm from "../components/EventForm.js";
+
+      function NewEventPage() {
+        return <EventForm method="post" />;
+      }
+
+      export default NewEventPage;
+
+      // EditEvent.js ---------------------------------------------------------
+
+      import { useRouteLoaderData } from "react-router-dom";
+
+      import EventForm from "../components/EventForm.js";
+
+      function EditEventPage() {
+        const data = useRouteLoaderData("event-detail");
+        const event = data.event;
+
+        return <EventForm method="patch" event={event} />;
+      }
+
+      export default EditEventPage;
+        `,
+      },
+    ],
+  },
+  {
+    id: "tp6",
+    title: "Advanced",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Behind-the-scenes work with useFetcher()",
+        text: `If an action function might possibly get triggered on multiple routes, it’s a perfect case to execute it behind the scene with “useFetcher” hook. “useFetcher” interacts with route loaders and actions without causing a navigation (= without transitions to any pages). Thus, it’s great for any interaction that stays on the same page.`,
+        code: `
+      import { useFetcher } from "react-router-dom";
+
+      ....
+
+        const fetcher = useFetcher();
+        const { data, state } = fetcher;
+        
+        useEffect(() => {
+          if (state === "idle" && data && data.message) {
+            window.alert("Successfully signed up the newsletter!!");
+          }
+        }, [data, state]);
+        
+        return (
+          <fetcher.Form
+            method="post"
+            action="/newsletter"
+            className={classes.newsletter}
+          >
+            <input
+              type="email"
+              placeholder="Sign up for newsletter..."
+              aria-label="Sign up for newsletter"
+            />
+            <button>Sign up</button>
+          </fetcher.Form>
+        );
+
+      ....
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Differring data fetching",
+        text: `For better user experiences, something should be showed while loading contents with http requests. In such cases, use “defer()” method, “Await” element and “Suspense” element. Note that the loading function returns “defer()” method instead of Promise (”response”), “loadEvents” function shouldn’t return Promise, but must return a resolved Promise with “json()” method.`,
+        code: `
+      import { Suspense } from "react";
+      import { useLoaderData, json, defer, Await } from "react-router-dom";
+      import EventsList from "../components/EventsList.js";
+
+      /**
+       * EVENTS PAGE
+       */
+      function EventsPage() {
+        const { events } = useLoaderData(); // fetch all data in Promise
+
+        return (
+          <Suspense fallback={<p style={{ textAlign: "center" }}>Loading ....</p>}>
+            <Await resolve={events}>
+              {(loadedEvents) => <EventsList events={loadedEvents} />}
+            </Await>
+          </Suspense>
+        );
+      }
+
+      export default EventsPage;
+
+      /**
+       * LOAD EVENTS FUNCTION
+       */
+      async function loadEvents() {
+        const response = await fetch("http://localhost:8080/events");
+
+        if (!response.ok) {
+          throw json({ message: "Could not fetch events." }, { status: 500 });
+        } else {
+          const resData = await response.json();
+          return resData.events;
+        }
+      }
+
+      /**
+       * LOADER FUNCTION
+       */
+      export function loader() {
+        return defer({
+          events: loadEvents(),
+        });
+      }  
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Show data while loading other data",
+        text: `“defer()” helps to show data whilst other data is still loading. You can also add “await” to defer() inside the “loader” function to tell react-router-dom not to move to the page until data gets loaded. The order is 1) “loadEvent” function gets executed and returns data, 2) move to the event detail page, 3) “loadEvents” function gets executed and returns data.`,
+        code: `
+      import {
+        json,
+        useRouteLoaderData,
+        redirect,
+        defer,
+        Await,
+      } from "react-router-dom";
+      import EventItem from "../components/EventItem.js";
+      import EventsList from "../components/EventsList.js";
+      import { Suspense } from "react";
+
+      /**
+       * EVENT DETAIL PAGE
+       */
+      function EventDetailPage() {
+        const { event, events } = useRouteLoaderData("event-detail");
+
+        return (
+          <>
+            <Suspense fallback={<p style={{ textAlign: "center" }}>Loading ....</p>}>
+              <Await resolve={event}>
+                {(loadedEvent) => <EventItem event={loadedEvent} />}
+              </Await>
+            </Suspense>
+            <Suspense fallback={<p style={{ textAlign: "center" }}>Loading ....</p>}>
+              <Await resolve={events}>
+                {(loadedEvents) => <EventsList events={loadedEvents} />}
+              </Await>
+            </Suspense>
+          </>
+        );
+      }
+
+      export default EventDetailPage;
+
+      /**
+       * LOAD EVENT FUNCTION
+       */
+      async function loadEvent(id) {
+        const response = await fetch("http://localhost:8080/events/" + id);
+
+        if (!response.ok) {
+          throw json(
+            { message: "Could not fetch details for selected events." },
+            { status: 500 }
+          );
+        } else {
+          const resData = await response.json();
+          return resData.event;
+        }
+      }
+
+      /**
+       * LOAD EVENTS FUNCTION
+       */
+      async function loadEvents() {
+        const response = await fetch("http://localhost:8080/events");
+
+        if (!response.ok) {
+          throw json({ message: "Could not fetch events." }, { status: 500 });
+        } else {
+          const resData = await response.json();
+          return resData.events;
+        }
+      }
+
+      /**
+       * LOADER FUNCTION
+       */
+      export async function loader({ request, params }) {
+        const id = params.eventId; // access the dynamic segment
+
+        return defer({
+          event: await loadEvent(id), // await before moving to the page
+          events: loadEvents(),
+        });
+      }
+
+      /**
+       * ACTION FUNCTION
+       */
+      export async function action({ params, request }) {
+        const eventId = params.eventId;
+        const response = await fetch("http://localhost:8080/events/" + eventId, {
+          method: request.method,
+        });
+
+        if (!response.ok) {
+          throw json({ message: "Could not delete event." }, { status: 500 });
+        }
+
+        return redirect("/events");
+      } 
         `,
       },
     ],
