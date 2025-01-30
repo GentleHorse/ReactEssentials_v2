@@ -3104,24 +3104,369 @@ export const REDUX_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "What’s Redux and why use it",
+        text: `“Redux” is a state management system for cross-component or app-wide state. React Context could also play the same role, but there are several disadvantages such as potential deeply nested providers and bad performance.`,
         code: `
-  
+      return (
+          <AuthContextProvider>
+              <ThemeContextProvider>
+                  <UIInteractionContextProvider>
+                      <MultiStepFormContextProvider>
+                          <UserRegistration />
+                      </MultiStepFormContextProvider>
+                  </UIInteractionContextProvider>
+              </ThemeContextProvider>
+          </AuthContextProvider>
+      );
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "How Redux works",
+        text: `Managing ONLY ONE central data (state) store and components subscribe it. Components are NOT DIRECTLY related to state changes, instead “Reducer Function” is in charge of mutating data in the store. Reducer Function runs TWICE; first at the initialization, then by dispatched “Action”. The point is that Reducer Function ALWAYS inputs “old state + dispatch action” and outputs “new state object”. `,
+        code: `
+      /**
+       * IMPORT REDUX
+       */
+      const redux = require("redux");
+
+      /**
+       * REDUCER FUNCTION
+       */
+      const counterReducer = (state = { counter: 0 }, action) => {
+          if (action.type === "increment") {
+          return {
+              counter: state.counter + 1,
+          };
+          }
+
+          if (action.type === "decrement") {
+          return {
+              counter: state.counter - 1,
+          };
+          }
+
+          return state;
+      };
+
+      /**
+       * STORE
+       */
+      const store = redux.createStore(counterReducer);
+
+      /**
+       * SUBSCRIPTION
+       */
+      const counterSubscriber = () => {
+          const latestState = store.getState();
+          console.log(latestState);
+      };
+
+      store.subscribe(counterSubscriber);
+
+      /**
+       * DISPATCH AN ACTION
+       */
+      store.dispatch({ type: "increment" }); // Output ---> { counter: 1 }
+
+      store.dispatch({ type: "decrement" }); // Output ---> { counter: 0 }
         `,
       },
     ],
   },
   {
     id: "tp2",
-    title: "Redux with React - 1",
+    title: "Redux with React",
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Getting started",
+        text: `In order to use Redux with React, you should install “redux” & “react-redux”.`,
         code: `
-  
+      npm install redux
+      npm install react-redux
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Create the store",
+        text: `You need to create only ONE store for using Redux.`,
+        code: `
+      import { createStore } from "redux";
+
+      /**
+       * REDUCER FUNCTION
+       */
+      const counterReducer = (state = { counter: 0 }, action) => {
+        if (action.type === "increment") {
+          return {
+            counter: state.counter + 1,
+          };
+        }
+
+        if (action.type === "decrement") {
+          return {
+            counter: state.counter - 1,
+          };
+        }
+
+        return state;
+      };
+
+      /**
+       * STORE
+       */
+      const store = createStore(counterReducer);
+
+      /**
+       * EXPOSE THE STORE FOR OUTSIDE COMPONENT
+       */
+      export default store;
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Providing the store",
+        text: `In order to use the store, you need to provided it at the highest level.`,
+        code: `
+      import React from "react";
+      import ReactDOM from "react-dom/client";
+      import { Provider } from "react-redux";
+
+      import "./index.css";
+      import App from "./App";
+      import store from "./store/index.js";
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(
+        <Provider store={store}>
+          <App />
+        </Provider>
+      );
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Use the store (useSelector)",
+        text: `“react-redux” automatically sets up the subscription for the component. This means whenever the component is re-rendered, it automatically fetch the latest state data.`,
+        code: `
+      import { useSelector } from 'react-redux';
+
+      ....
+
+      const Counter = () => {
+
+        const counter = useSelector(state => state.counter);
+
+        return (
+          
+          ....
+          
+            <div className={classes.value}>{counter}</div>
+            
+          ....
+          
+        );
+      };
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Dispatch actions (useDispatch)",
+        text: `To dispatch actions, you need to use “useDispatch” as a dispatch function.`,
+        code: `
+      import { useSelector, useDispatch } from "react-redux";
+
+      ....
+
+      const Counter = () => {
+        
+        const dispatch = useDispatch();
+
+        ....
+
+        const incrementHandler = () => {
+          dispatch({ type: "increment" });
+        };
+
+        const decrementHandler = () => {
+          dispatch({ type: "decrement" });
+        };
+
+        ....
+
+        return (
+          
+          ....
+          
+              <button onClick={incrementHandler}>Increment</button>
+              <button onClick={decrementHandler}>Descrement</button>
+            
+            ....
+            
+        );
+      };
+        `,
+      },
+      {
+        id: "sbtp6",
+        title: "Redux with class-based component",
+        text: `With class-based component, you cannot use hooks, so you need to use “connect” functions for export the component and pass two values: “mapStateToProps” & “mapDispatchToProps”.  To use three props (the counter state, increment dispatch function and decrement dispatch function), you need to add “this.props” in front of them, and for two dispatch functions, don’t forget to “bind” them.`,
+        code: `
+      import { Component } from "react";
+      import { connect } from "react-redux";
+
+      import classes from "./Counter.module.css";
+
+      class CounterClassBasedVer extends Component {
+
+        /**
+         * HANDLERS - INCREMENT, DECREMENT, TOGGLE
+         */
+        incrementHandler() {
+          this.props.increment();
+        }
+        decrementHandler() {
+          this.props.decrement();
+        }
+
+        toggleCounterHandler() {}
+
+        render() {
+          return (
+            <main className={classes.counter}>
+              <h1>Redux Counter</h1>
+              <div className={classes.value}>{this.props.counter}</div>
+              <div>
+                <button onClick={this.incrementHandler.bind(this)}>Increment</button>
+                <button onClick={this.decrementHandler.bind(this)}>Descrement</button>
+              </div>
+              <button onClick={this.toggleCounterHandler.bind(this)}>
+                Toggle Counter
+              </button>
+            </main>
+          );
+        }
+      }
+
+      /**
+       * STATE MAP PROPS FUNTION 
+       */
+      const mapStateToProps = (state) => {
+        return {
+          counter: state.counter,
+        };
+      };
+
+      /**
+       * DISPATCH MAP PROPS FUNCTION
+       */
+      const mapDispatchToProps = (dispatch) => {
+        return {
+          increment: () => dispatch({ type: "increment" }),
+          decrement: () => dispatch({ type: "decrement" }),
+        };
+      };
+
+      export default connect(
+        mapStateToProps,
+        mapDispatchToProps
+      )(CounterClassBasedVer);
+        `,
+      },
+      {
+        id: "sbtp7",
+        title: "Attaching payloads to actions",
+        text: `For reducer functions, you can payload to actions for more flexibility. In the below example, “amount” is the payload for the action.`,
+        code: `
+      // store > index.js -----------------------------------------
+
+      const counterReducer = (state = { counter: 0 }, action) => {
+        
+        ....
+
+        if (action.type === "increse") {
+          return {
+            counter: state.counter + action.amount,
+          };
+        }
+
+        ....
+        
+      };
+
+      // the component ----------------------------------------------
+
+      const increaseHandler = () => {
+        dispatch({ type: "increse", amount: 5 });
+      };
+
+      ....
+
+        <button onClick={increaseHandler}>Increse by 5</button>
+        
+      ....
+        `,
+      },
+      {
+        id: "sbtp8",
+        title: "Working with multiple state properties",
+        text: `If there’re multiple state properties, you need to return all of them inside the reducer function (in below case, “counter” & “showCounter”) because redux (react) doesn’t merge them automatically for you (technically, it overrides the old state properties instead of merging them).  And you MUST NOT MUTATE THE EXISTING STATE PROPERTIES (which might cause unpredictable behaviours)!!  Note that everytime one of the state properties changes, the component gets re-rendered.`,
+        code: `
+      // store > index.js -----------------------------------------
+
+      const initialState = { counter: 0, showCounter: true };
+
+      const counterReducer = (state = initialState, action) => {
+        if (action.type === "increment") {
+          return {
+            counter: state.counter + 1,
+            showCounter: state.showCounter,
+          };
+        }
+
+        if (action.type === "increse") {
+          return {
+            counter: state.counter + action.amount,
+            showCounter: state.showCounter,
+          };
+        }
+
+        if (action.type === "decrement") {
+          return {
+            counter: state.counter - 1,
+            showCounter: state.showCounter,
+          };
+        }
+
+        if (action.type === "toggle") {
+          return {
+            counter: state.counter,
+            showCounter: !state.showCounter,
+          };
+        }
+
+        return state;
+      };
+
+      ....
+
+
+      // the component ----------------------------------------------
+
+      const showCounter = useSelector((state) => state.showCounter);
+
+      ....
+
+        const toggleCounterHandler = () => {
+        dispatch({ type: "toggle" });
+      };
+
+      ....
+
+        <div className={classes.value}>{showCounter && counter}</div>
+        
+      ....	
         `,
       },
     ],
@@ -3132,10 +3477,228 @@ export const REDUX_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Getting started",
+        text: `You need to install extra package for using Redux Toolkit.`,
         code: `
-  
+      npm install @reduxjs/toolkit
+      npm install react-redux
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Adding state slices",
+        text: `Import “createSlice” which expects an object as an argument. So you need to prepare the slice of the global state. You can create mutiple state slices for maintaining an app. One of the great points of Redux Toolkit is that you can handle state properties in “seemingly” mutating way (like state.counter++) because behind the scene, it will automatically detect it and create the clone of state properties to not mutating the existing states.`,
+        code: `
+      const initialState = { counter: 0, showCounter: true };
+
+      ...
+
+      const counterSlice = createSlice({
+        name: "counter",
+        initialState: initialState,
+        reducers: {
+          increment(state) {
+            state.counter++;
+          },
+          decrement(state) {
+            state.counter--;
+          },
+          increase(state, action) {
+            state.counter += action.amount;
+          },
+          toggleCounter(state) {
+            state.showCounter = !state.showCounter;
+          },
+        },
+      });
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Connecting Redux Toolkit State",
+        text: `Pass the state slice reducer to the store. To do that, use “configureStore” instead of “createStore” because it automatically merges the multiple reducers.`,
+        code: `
+      const counterSlice = createSlice({
+
+        ....
+        
+      });
+
+      const store = configureStore({
+        reducer: counterSlice.reducer,
+      });
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Providing the store",
+        text: `In order to use the store, you need to provided it at the highest level.`,
+        code: `
+      import React from "react";
+      import ReactDOM from "react-dom/client";
+      import { Provider } from "react-redux";
+
+      import "./index.css";
+      import App from "./App";
+      import store from "./store/index.js";
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(
+        <Provider store={store}>
+          <App />
+        </Provider>
+      );
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Action objects",
+        text: `You can access the slice state methods through the “actions” property and it automatically creates and returns the action object. To dispatch the action object methods (increment, decrement, etc), use “useDispatch()”. Not that if you want to payload some values, you need to set through “payload” attribute.`,
+        code: `
+      // store > index.js -----------------------------------------
+
+      ....
+
+      const counterSlice = createSlice({
+        
+        ....
+        
+        reducers: {
+          increment(state) {
+            state.counter++;
+          },
+          decrement(state) {
+            state.counter--;
+          },
+          increase(state, action) {
+            state.counter += action.payload;
+          },
+          toggleCounter(state) {
+            state.showCounter = !state.showCounter;
+          },
+        },
+
+      });
+
+      ....
+
+      export const counterActions = counterSlice.actions;
+
+
+
+      // the component ----------------------------------------------
+
+      ....
+
+      const dispatch = useDispatch();
+
+      ....
+
+      const incrementHandler = () => {
+        dispatch(counterActions.increment());
+      };
+
+      const increaseHandler = () => {
+        dispatch(counterActions.increase(5)); // { type: SOME_UNIQUE_IDENTIFIER, payload: 5 }
+      };
+
+      const decrementHandler = () => {
+        dispatch(counterActions.decrement());
+      };
+
+      const toggleCounterHandler = () => {
+        dispatch(counterActions.toggleCounter());
+      };
+
+      ....
+        `,
+      },
+      {
+        id: "sbtp6",
+        title: "Working with multiple slices",
+        text: `Even if you work with mutiple slices, you must have the only ONE store and ONE reducer. Note that to access the state, you need to do it via identifiers of the store “reducer” attribute (in the below example, ”counter’ & “auth”).`,
+        code: `
+      // store > index.js -----------------------------------------
+
+      import { createSlice, configureStore } from "@reduxjs/toolkit";
+
+      /**
+       * INITIAL STATE  - COUNTER, AUTHENTICATION
+       */
+      const initialCounterState = { counter: 0, showCounter: true };
+
+      const initialAuthState = { isAuthenticated: false };
+
+      /**
+       * STATE SLICES - COUNTER, AUTHENTICATION
+       */
+      const counterSlice = createSlice({
+        name: "counter",
+        initialState: initialCounterState,
+        reducers: {
+          // They can be accessed via the "action" property
+          increment(state) {
+            state.counter++;
+          },
+          decrement(state) {
+            state.counter--;
+          },
+          increase(state, action) {
+            state.counter += action.payload;
+          },
+          toggleCounter(state) {
+            state.showCounter = !state.showCounter;
+          },
+        },
+      });
+
+      const authSlice = createSlice({
+        name: "authentication",
+        initialState: initialAuthState,
+        reducers: {
+          login(state) {
+            state.isAuthenticated = true;
+          },
+          logout(state) {
+            state.isAuthenticated = false;
+          },
+        },
+      });
+
+      /**
+       * STORE
+       */
+      const store = configureStore({
+        reducer: {
+          counter: counterSlice.reducer,
+          auth: authSlice.reducer,
+        },
+      });
+
+      /**
+       * EXPORT
+       */
+      export const counterActions = counterSlice.actions;
+      export const authActions = authSlice.actions;
+
+      export default store;
+
+      // the component - Counter.js -------------------------------
+
+      ....
+
+      const counter = useSelector((state) => state.counter.counter);
+      const showCounter = useSelector((state) => state.counter.showCounter);
+
+      ....
+
+      // the component - Header.js --------------------------------
+
+      ....
+
+      const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+      ....
         `,
       },
     ],
@@ -3146,10 +3709,242 @@ export const REDUX_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Async code with useEffect",
+        text: `You MUST NOT include side-effects and async tasks (ex. http requests) inside reducer functions. One of the TWO places to execute them is inside the components with “useEffect” hook. In the below example, everytime the redux state slice (cart) is updated, the cart data is sent to the backend via http request (The order is FIRST updating the redux state slice (cart) and THEN sending http request to store the data (cart) in the backend server).`,
         code: `
-  
+      // App.js ------------------------------------------------------------------------
+
+      let isInitial = true;
+
+      function App() {
+        
+        ....
+        
+        const cart = useSelector((state) => state.cart);
+        
+        ....
+
+        useEffect(() => {
+        
+        /**
+         * DEFINE THE FUNCTION
+         */
+        const sendCartData = async () => {
+          const response = await fetch(
+            "https://--<<some firebase database url>>---- /cart.json",
+            { method: "PUT", body: JSON.stringify(cart) }
+          );
+        }
+          
+        /**
+         * PREVENT EXECUTE AT THE INITIAL RENDER
+         */  
+        if (isInitial){
+          isInitial = false;
+          return;
+          }
+          
+        /**
+         * EXECUTE THE FUNCTION
+         */  
+        sendCartData(); 
+          
+        }, [cart]);
+
+        ....
+        
+      }
+
+      export default App;
+
+
+      // store > index.js ---------------------------------------------------------------
+
+      import { configureStore } from "@reduxjs/toolkit";
+      import uiSlice from "./ui-slice";
+      import cartSlice from "./cart-slice";
+
+      const store = configureStore({
+        reducer: {
+          ui: uiSlice.reducer,
+          cart: cartSlice.reducer,
+        },
+      });
+
+      export default store;
+        `,
+      },
+      {
+        id: "sbtp2",
+        title: "Aync code with action creator thunk",
+        text: `Another place to execute async tasks is inside an action creator thunk.  An action creator function does NOT return the action itself, instead returns ANOTHER FUNCTION which EVENTUALLY returns the action (= it delays the action until later). In the below example, defin e “action creator thunk” inside cart-slice.js file and export to the App component where that action gets dispatched.`,
+        code: `
+      // store > cart-slice.js -------------------------------------------------------
+
+      export const sendCartData = (cart) => {
+        return async (dispatch) => {
+          // UI - sending the cart data
+          dispatch(
+            uiActions.showNotification({
+              status: "pending",
+              title: "Sending ....",
+              message: "Sending cart data!",
+            })
+          );
+
+          /**
+           * DEFINE HTTP REQUEST (PUT)
+           */
+          const sendRequest = async () => {
+            const response = await fetch(
+              "https://--<<some firebase database url>>---- /cart.json",
+              { method: "PUT", body: JSON.stringify(cart) }
+            );
+
+            // Failed
+            if (!response.ok) {
+              throw new Error("Sending cart data failed.");
+            }
+          };
+
+          /**
+           * SEND HTTP REQUEST (PUT)
+           */
+          try {
+            // Execute sending the request
+            await sendRequest();
+
+            // UI - succeeded in sending
+            dispatch(
+              uiActions.showNotification({
+                status: "success",
+                title: "Success!",
+                message: "Sent cart data successfully!",
+              })
+            );
+          } catch (error) {
+            // UI - failed in sending
+            dispatch(
+              uiActions.showNotification({
+                status: "error",
+                title: "Error!",
+                message: "Sending cart data failed!",
+              })
+            );
+          }
+        };
+      };
+
+
+      // App.js ------------------------------------------------------------------------
+
+      ....
+
+      import { sendCartData } from "./store/cart-slice.js";
+
+      let isInitial = true;
+
+      function App() {
+        const dispatch = useDispatch();
+
+        ....
+        
+        const cart = useSelector((state) => state.cart);
+        
+        ....
+
+        useEffect(() => {
+        
+          // Prevent the code from being executed at the initial render
+          if (isInitial) {
+            isInitial = false;
+            return;
+          }
+
+          // Dispatch the http request action
+          dispatch(sendCartData(cart));
+          
+        }, [cart, dispatch]);
+
+        
+        ....
+        
+      }
+
+      export default App;
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Fetching data",
+        text: `In the below example, the action creator first fetches the cart data and then updates the slice state of cart in redux.  The action creator is called in App.js component at the initial render.`,
+        code: `
+      // store > cart-slice.js -------------------------------------------------------
+
+      export const fetchCartData = () => {
+
+        return async (dispatch) => {
+          /**
+           * DEFINE HTTP REQUEST (GET)
+           */
+          const fetchData = async () => {
+            const response = await fetch("https://--<<some firebase database url>>---- /cart.json");
+
+            if (!response.ok) {
+              throw new Error("Could not fetch cart data!");
+            }
+
+            const data = await response.json();
+
+            return data;
+          };
+
+          /**
+           * SEND HTTP REQUEST (GET)
+           */
+          try {
+          
+            // Fetch the cart data and set to the cart
+            const cartData = await fetchData();
+            dispatch(cartActions.replaceCart(cartData));
+            
+          } catch (error) {
+          
+            // UI - failed in sending
+            dispatch(
+              uiActions.showNotification({
+                status: "error",
+                title: "Error!",
+                message: "Fetching cart data failed!",
+              })
+            );
+            
+          }
+        };
+      };
+
+      // store > cart-actions.js -----------------------------------------------------
+
+      const cartSlice = createSlice({
+        
+        ....
+        
+        reducers: {
+          
+          replaceCart(state, action) {
+            state.items = action.payload.items;
+            state.totalQuantity = action.payload.totalQuantity;
+          },
+
+          ....
+        },
+      });
+
+      // App.js ----------------------------------------------------------------------
+
+      useEffect(() => {
+        dispatch(fetchCartData());
+      }, [dispatch]);
         `,
       },
     ],
