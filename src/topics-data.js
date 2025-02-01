@@ -5390,6 +5390,555 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
       },
     ],
   },
+  {
+    id: "tp2",
+    title: "Auth action and validation",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Implementing auth action",
+        text: `Since “login” or “signup” data is submitted with <Form> component,  you can get the submitted data by “formData()” method and access individual elements by their names through “get()” method. And in order to get the query parameters, use “new URL().searchParams” and use ‘get()” method to access them.`,
+        code: `
+      // APP.js ----------------------------------------------------------------------------
+
+            {
+              path: "auth",
+              element: <AuthenticationPage />,
+              action: authAction,
+            },
+
+      // Authentication.js -----------------------------------------------------------------
+
+      import { json, redirect } from "react-router-dom";
+      import AuthForm from "../components/AuthForm";
+
+      function AuthenticationPage() {
+        return <AuthForm />;
+      }
+
+      export default AuthenticationPage;
+
+      export async function action({ request }) {
+        const searchParams = new URL(request.url).searchParams;
+        const mode = searchParams.get("mode") || "login";
+
+        if (mode !== "login" && mode !== "signup") {
+          throw json({ message: "Unsupported mode." }, { status: 422 });
+        }
+
+        const data = await request.formData();
+        const authData = {
+          email: data.get("email"),
+          password: data.get("password"),
+        };
+
+        const response = await fetch("http://localhost:8080/" + mode, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(authData),
+        });
+
+        if (response.status === 422 || response.status === 401) {
+          return response;
+        }
+
+        if (!response.ok) {
+          throw json({ message: "Could not authenticate user." }, { status: 500 });
+        }
+
+        // Here, code for managing that token
+
+        return redirect("/");
+      }
+
+      // AuthForm.js -----------------------------------------------------------------------
+
+      export default function AuthForm() {
+
+        ....
+
+        return (
+          <>
+            <Form method="post" className={classes.form}>
+              
+              ....
+              
+            </Form>
+          </>
+        );
+      }
+        `, 
+      },
+      {
+        id: "sbtp2",
+        title: "Output validation errors",
+        text: `By using “useActionData()” hook, you can get something if an action returns something (in below case, “response” under the condition of status code 422 or 401).`,
+        code: `
+      // Authentication.js -----------------------------------------------------------------
+
+      export async function action({ request }) {
+        
+        ....
+
+        if (response.status === 422 || response.status === 401) {
+          return response;
+        }
+
+        ....
+        
+      }
+
+
+      // AuthForm.js -----------------------------------------------------------------------
+
+      import { useActionData } from "react-router-dom";
+
+      export default function AuthForm() {
+        
+        const data = useActionData();
+
+        ....
+
+        return (
+          <>
+            <Form method="post" className={classes.form}>
+              
+              ....
+              
+              {data && data.errors && (
+                <ul>
+                  {Object.values(data.errors).map((err) => (
+                    <li key={err}>{err}</li>
+                  ))}
+                </ul>
+              )}
+              
+              {data && data.message && <p>{data.message}</p>}
+              
+              ....
+              
+            </Form>
+          </>
+        );
+      }
+        `, 
+      },
+    ],
+  },
+  {
+    id: "tp3",
+    title: "Auth token",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Get the auth token and store it locally",
+        text: `(Suppose the backend issues and returns a token under the name of “token” everytime a user submits a signup request.) First, you need to extract the token and then store it properly.`,
+        code: `
+      // Authentication.js -----------------------------------------------------------------
+
+      export async function action({ request }) {
+        
+        ....
+
+        const resData = await response.json();
+        const token = resData.token;
+
+        localStorage.setItem("token", token);
+
+        ....
+        
+      }
+        `, 
+      },
+      {
+        id: "sbtp2",
+        title: "Attaching auth tokens to outgoing requests",
+        text: `To attach the auth token to outgoing requests,  include it to “headers” in actions. `,
+        code: `
+      // auth.js ---------------------------------------------------------------------------
+
+      export function getAuthToken() {
+          const token = localStorage.getItem("token");
+          return token;
+      }
+
+      // EventDetails.js -------------------------------------------------------------------
+
+      export async function action({ params, request }) {
+        const eventId = params.eventId;
+
+        const token = getAuthToken();
+        
+        const response = await fetch('http://localhost:8080/events/' + eventId, {
+          method: request.method,
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
+
+        ....
+        
+      }
+
+      // EventForm.js ----------------------------------------------------------------------
+
+      export async function action({ request, params }) {
+        
+        ....
+        
+        const token = getAuthToken();
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify(eventData),
+        });
+
+        ....
+        
+      }
+        `, 
+      },
+      {
+        id: "sbtp3",
+        title: "User logout",
+        text: `(Suppose an auth token is stored in browser local storage.) In the below example, when a user clicks the “logout” button in the main navigation, the auth token in the local storage will be removed.`,
+        code: `
+      // APP.js ----------------------------------------------------------------------------
+
+      import { action as logoutAction } from "./pages/Logout.js";
+
+          ....
+
+            {
+              path: "logout",
+              action: logoutAction
+            },
+
+      // pages > Logout.js -----------------------------------------------------------------
+
+      import { redirect } from "react-router-dom";
+
+      export function action() {
+        localStorage.removeItem("token");
+        return redirect("/");
+      }
+
+      // MainNavigation.js -----------------------------------------------------------------
+
+        ....
+            
+              <li>
+                <Form action="/logout" method="post">
+                  <button>Logout</button>
+                </Form>
+              </li>
+        `, 
+      },
+      {
+        id: "sbtp4",
+        title: "Updating the UI based on auth status",
+        text: `(Suppose an auth token is stored in browser local storage.) In order to update the UI based on auth status, you need to keep updating the auth token status in the local storage and let the react router to refresh the page based on that auth token status. And to let other route access to the latest auth token, add “id” property to the root route.`,
+        code: `
+      // auth.js ---------------------------------------------------------------------------
+
+      export function getAuthToken() {
+          const token = localStorage.getItem("token");
+          return token;
+      }
+
+      export function tokenLoader() {
+          return getAuthToken();
+      }
+
+      // APP.js ----------------------------------------------------------------------------
+
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          errorElement: <ErrorPage />,
+          id: 'root',
+          loader: tokenLoader,
+          children: [ ... ],
+        },
+        
+        ....
+        
+      ]);
+
+      // MainNavigation.js -----------------------------------------------------------------
+
+      export default function MainNavigation() {
+        const token = useRouteLoaderData("root");
+
+        return (
+          <header className={classes.header}>
+            
+              ....
+
+                {!token && (
+                  <li>
+                    <NavLink
+                      to="/auth?mode=login"
+                      className={({ isActive }) =>
+                        isActive ? classes.active : undefined
+                      }
+                    >
+                      Authentication
+                    </NavLink>
+                  </li>
+                )}
+
+                {token && (
+                  <li>
+                    <Form action="/logout" method="post">
+                      <button>Logout</button>
+                    </Form>
+                  </li>
+                )}
+
+              ....
+              
+          </header>
+        );
+      }
+
+      // EventsNavigation.js ---------------------------------------------------------------
+
+      export default function EventsNavigation() {
+        const token = useRouteLoaderData("root");
+
+        return (
+          <header className={classes.header}>
+            <nav>
+              <ul className={classes.list}>
+
+                ....
+
+                {token && (
+                  <li>
+                    <NavLink
+                      to="/events/new"
+                      className={({ isActive }) =>
+                        isActive ? classes.active : undefined
+                      }
+                    >
+                      New Event
+                    </NavLink>
+                  </li>
+                )}
+                
+              </ul>
+            </nav>
+          </header>
+        );
+      }
+
+      // EventItem.js ----------------------------------------------------------------------
+
+      export default function EventItem({ event }) {
+        const token = useRouteLoaderData("root");
+
+        ....
+
+        return (
+          <article className={classes.event}>
+            
+            ....
+            
+            {token && (
+              <menu className={classes.actions}>
+                <Link to="edit">Edit</Link>
+                <button onClick={startDeleteHandler}>Delete</button>
+              </menu>
+            )}
+            
+          </article>
+        );
+      }
+        `, 
+      },
+      {
+        id: "sbtp5",
+        title: "Route protection",
+        text: `Even if the UI is updated based on the auth token status, a use can access to route by entering the url manually (for instance, “https:// …. /new” or “https:// …. /edit”) even though a user cannot submit the data to backend. To prevent this, create a auth token check loader and implement to routes you want to protect (in the below example, it’s “edit” and “new”).`,
+        code: `
+      // auth.js ---------------------------------------------------------------------------
+
+      export function checkAuthLoader() {
+        const token = getAuthToken();
+
+        if (!token) {
+          return redirect("/auth");
+        }
+
+        return null;
+      }
+
+      // APP.js ----------------------------------------------------------------------------
+
+          .....
+              
+                {
+                  index: true,
+                  element: <EventsPage />,
+                  loader: eventsLoader,
+                },
+                {
+                  path: ":eventId",
+                  id: "event-detail",
+                  loader: eventDetailLoader,
+                  children: [
+                    {
+                      index: true,
+                      element: <EventDetailPage />,
+                      action: deleteEventAction,
+                    },
+                    {
+                      path: "edit",
+                      element: <EditEventPage />,
+                      action: manipulateEventAction,
+                      loader: checkAuthLoader
+                    },
+                  ],
+                },
+                {
+                  path: "new",
+                  element: <NewEventPage />,
+                  action: manipulateEventAction,
+                  loader: checkAuthLoader
+                },
+                
+          .....
+        `, 
+      },
+      {
+        id: "sbtp6",
+        title: "Automatic user logout",
+        text: `You can implement automatic user logout logic with clearing an auth token when certain time passes by calling a “logout” action in RootLayout component.`,
+        code: `
+      // Root.js ---------------------------------------------------------------------------
+
+      function RootLayout() {
+
+        // Get the token
+        const token = useLoaderData();
+        
+        // Submit data to backend manually
+        const submit = useSubmit();
+
+        // Clear out the auth token in one hour
+        useEffect(() => {
+        
+          // No token, then do nothing
+          if (!token) {
+            return;
+          }
+
+          // If there's token, initiate the action (no data send)
+          setTimeout(() => {
+            submit(null, { action: "/logout", method: "post" });
+          }, 1 * 60 * 60 * 1000);
+          
+        }, [token, submit]);
+
+        return (
+          <>
+            <MainNavigation />
+            <main>
+              <Outlet />
+            </main>
+          </>
+        );
+      }
+
+      export default RootLayout;
+        `, 
+      },
+      {
+        id: "sbtp7",
+        title: "Managing the token expiration",
+        text: `With only automatic user logout logic, it’s not sufficient because the timer can easily reset when a user reload the page. Thus, it’s important to set the expiration logic for an auth token. The logis is: 1) register the expiration when a user logs in, 2) set the “EXPIRED” flag based on the duration, 3) if the token is expired, make a user log out automatically and clear the token data.`,
+        code: `
+      // Authentication.js -----------------------------------------------------------------
+
+      export async function action({ request }) {
+        
+        ....
+
+        const expiration = new Date();
+        expiration.setHours(expiration.getHours() + 1);
+        localStorage.setItem("expiration", expiration.toISOString());
+
+        ....
+        
+      }
+
+      // auth.js ---------------------------------------------------------------------------
+
+      export function getTokenDuration() {
+        const storedExpirationDate = localStorage.getItem("expiration");
+        const expirationDate = new Date(storedExpirationDate);
+        const now = new Date();
+        const duration = expirationDate.getTime() - now.getTime();
+        return duration;
+      }
+
+      export function getAuthToken() {
+        const token = localStorage.getItem("token");
+
+        if (!token){
+          return null;
+        }
+
+        const tokenDuration = getTokenDuration();
+
+        if (tokenDuration < 0) {
+          return "EXPIRED";
+        }
+
+        return token;
+      }
+
+      // Root.js ---------------------------------------------------------------------------
+
+        useEffect(() => {
+          if (!token) {
+            return;
+          }
+
+          if (token === "EXPIRED") {
+            submit(null, { action: "/logout", method: "post" });
+            return;
+          }
+
+          const tokenDuration = getTokenDuration();
+          console.log(tokenDuration);
+
+          setTimeout(() => {
+            submit(null, { action: "/logout", method: "post" });
+          }, tokenDuration);
+        }, [token, submit]);
+        
+      // Logout.js -------------------------------------------------------------------------
+
+      import { redirect } from "react-router-dom";
+
+      export function action() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("expiration");
+        return redirect("/");
+      }
+        `, 
+      },
+    ],
+  },
 ];
 
 export const MOUSE_EVENTS = [
