@@ -5332,6 +5332,43 @@ export const REACT_ROUTER_TOPICS_ARRAY = [
       } 
         `,
       },
+      {
+        id: "sbtp4",
+        title: "Query parameters",
+        text: `Query parameters are elements inserted in your URLs to help you filter and organize content. To identify a query parameter, look at the portion of the URL that comes after a question mark (?). Query parameters include a key and a value that are separated by an equals sign (=). Multiple parameters are then separated by an ampersand (&).`,
+        code: `
+      https//www.domain.com/page?key1=value1&key2=value2
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Working with query parameters",
+        text: `In order to use query parameters in react router, you need to use <Link> component to switch routes with query parameters and “useSearchParams()” function to get query parameters, which returns an array of the current URL's query parameters and a function to update them.`,
+        code: `
+      import { Form, Link, useSearchParams } from "react-router-dom";
+
+      export default function AuthForm() {
+        const [searchParams, setSearchParams] = useSearchParams();
+        const isLogin = searchParams.get("mode") === "login";
+
+        return (
+          <>
+            <Form>
+              
+                ....
+                  
+                <Link to={\`?mode=\${isLogin ? "signup" : "login"}\`}>
+                  {isLogin ? "Create new user" : "Login"}
+                </Link>
+
+                ....
+                
+            </Form>
+          </>
+        );
+      }
+        `,
+      },
     ],
   },
 ];
