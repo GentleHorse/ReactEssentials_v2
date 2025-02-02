@@ -261,6 +261,80 @@ export const BASICS_TOPICS_ARRAY = [
       }
         `,
       },
+      {
+        id: "sbtp6",
+        title: "With HTTP request",
+        text: `One of the most popular ways of useEffect() is to send HTTP requests with fetch() function and here’s the typical example. `,
+        code: `
+      // Data & error & loading state
+      const [data, setData] = useState();
+      const [error, setError] = useState();
+      const [isLoading, setIsLoading] = useState(false);
+
+      // Send HTTP request
+      useEffect(() => {
+
+        // 1. Define function
+        async function fetchEvents() {
+        
+          setIsLoading(true);
+          
+          const response = await fetch('http://localhost:3000/events');
+
+          if (!response.ok) {
+            const error = new Error('An error occurred while fetching the events');
+            error.code = response.status;
+            error.info = await response.json();
+            throw error;
+          }
+
+          const { events } = await response.json();   
+
+          return events;
+        }
+
+        // 2. Execute the function
+        fetchEvents()
+          .then((events) => {
+            setData(events);
+          })
+          .catch((error) => {
+            setError(error);
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }, []);
+
+      // Define content for showing UI conditionally
+      let content;
+
+      // for showing loading state UI
+      if (isLoading) {
+        content = <LoadingIndicator />;
+      }
+
+      // for showing error state UI
+      if (error) {
+        content = (
+          <ErrorBlock title="An error occurred" message="Failed to fetch events" />
+        );
+      }
+
+      // for showing successfully fetched data on UI
+      if (data) {
+        content = (
+          <ul className="events-list">
+            {data.map((event) => (
+              <li key={event.id}>
+                <EventItem event={event} />
+              </li>
+            ))}
+          </ul>
+        );
+      }
+        `,
+      },
     ],
   },
   {
