@@ -2945,6 +2945,144 @@ export const ADVANCED_TOPICS_ARRAY = [
       },
     ],
   },
+  {
+    id: "tp7",
+    title: "Deploying react app",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Deploying steps",
+        text: `You need to take several steps for deploying a react app:
+【Test Code】 Manually & with automated tests
+【Optimize Code】 Optimize user experience & performance
+【Build App】Run build process to parse, transform & optimize code
+【Upload App】Upload production code to hosting server
+【Configure Server】Ensure app is served securely & as intended`,
+      },
+      {
+        id: "sbtp2",
+        title: "Lazy loading",
+        text: `“Lazy loading” is loading code only when it’s needed. In the below example, <BlogPage /> & <PostPage /> are only imported when a user tries to visit the route, then after the page is imported, execute the “loader()” function. And also <BlogPage /> & <PostPage /> should be correctly prepared with “lazy()” method and needs to be wrapped with <Suspense> when it’s rendered. One thing to be noted is that if the page is required dynamic path parameter with “useParams” or other method, you need to pass “meta” to loader() function. `,
+        code: `
+      // App.js ---------------------------------------------------------------
+
+      import { lazy, Suspense } from "react";
+
+      const BlogPage = lazy(() => import("./pages/Blog"));
+      const PostPage = lazy(() => import("./pages/Post"));
+
+      const router = createBrowserRouter([
+        {
+          path: "/",
+          element: <RootLayout />,
+          children: [
+          
+            {
+              index: true,
+              element: <HomePage />,
+            },
+            
+            {
+              path: "posts",
+              children: [
+              
+                {
+                  index: true,
+                  element: (
+                    <Suspense fallback={<p>Loading ... </p>}>
+                      <BlogPage />
+                    </Suspense>
+                  ),
+                  loader: () =>
+                    import("./pages/Blog").then((module) => module.loader()),
+                },
+                
+                {
+                  path: ":id",
+                  element: (
+                    <Suspense fallback={<p>Loading ... </p>}>
+                      <PostPage />
+                    </Suspense>
+                  ),
+                  loader: (meta) =>
+                    import("./pages/Post").then((module) => module.loader(meta)),
+                },
+                
+              ],
+            },
+          ],
+        },
+      ]);
+        `,
+      },
+      {
+        id: "sbtp3",
+        title: "Building the code for production",
+        text: `To build the code for production, the code should be properly converted for browsers. Thus you need to run below code after killing the local server. The command produces a code bundle which is highly optimized and transformed, ready for uploading. After the execution is successfully finished, you can see the “build” folder.`,
+        code: `
+      npm run build
+        `,
+      },
+      {
+        id: "sbtp4",
+        title: "Deployment - firebase hosting",
+        text: `A react single page application (SPA) is a “static website”, which means that only containing HTML, CSS and JavaScript and no server-side codes needed to be executed. So a “static site hosting” is needed. Here, use firebase hosting service. Go to firebase hosting website > create a new project > Build > Hosting > Get Started. If you successfully connect your code to firebase, you can see “firebase.json” & “.firebaserc” files. `,
+        code: `
+      // 1. Install Firebase CLI ----------------------------------------------
+
+      npm install -g firebase-tools
+
+      // 2. Sign in to Google -------------------------------------------------
+
+      firebase login
+
+      // 3. Initiate your project ----------------------------------------------
+
+      firebase init   
+
+      // Choose "Hosting" feature
+      // "Use an existing project" for project option
+      // Select "build" folder for production
+      // Configure as a single-page app ---> Yes
+      // Set up automatic builds and deploys with GitHub? ---> No
+      // File build/index.html already exists. Overwrite? ---> No
+
+      // 4. Deploy to Firebase hosting -----------------------------------------
+
+      firebase deploy
+
+      // If you want to offline the server -------------------------------------
+
+      firebase hosting:disable
+        `,
+      },
+      {
+        id: "sbtp5",
+        title: "Server-side routing and required configuration",
+        text: `Even you use react router to make it accessible to multiple routes, it’s still a “SPA” because it all happens in client-side, not server-side.  This means the firebase always returns "/index.html" whatever request the client does!`,
+        code: `
+      // firebase.json --------------------------------------------------------
+
+      {
+        "hosting": {
+          "public": "build",
+          "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+          ],
+          "rewrites": [
+            {
+              "source": "**",
+              "destination": "/index.html"
+            }
+          ]
+        }
+      }
+        `,
+      },
+    ],
+  },
 ];
 
 export const REDUX_TOPICS_ARRAY = [
@@ -5319,7 +5457,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
           </>
         );
       }
-        `, 
+        `,
       },
       {
         id: "sbtp2",
@@ -5373,7 +5511,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
           </>
         );
       }
-        `, 
+        `,
       },
     ],
   },
@@ -5400,7 +5538,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
         ....
         
       }
-        `, 
+        `,
       },
       {
         id: "sbtp2",
@@ -5452,7 +5590,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
         ....
         
       }
-        `, 
+        `,
       },
       {
         id: "sbtp3",
@@ -5488,7 +5626,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
                   <button>Logout</button>
                 </Form>
               </li>
-        `, 
+        `,
       },
       {
         id: "sbtp4",
@@ -5612,7 +5750,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
           </article>
         );
       }
-        `, 
+        `,
       },
       {
         id: "sbtp5",
@@ -5666,7 +5804,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
                 },
                 
           .....
-        `, 
+        `,
       },
       {
         id: "sbtp6",
@@ -5709,7 +5847,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
       }
 
       export default RootLayout;
-        `, 
+        `,
       },
       {
         id: "sbtp7",
@@ -5785,7 +5923,7 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
         localStorage.removeItem("expiration");
         return redirect("/");
       }
-        `, 
+        `,
       },
     ],
   },
