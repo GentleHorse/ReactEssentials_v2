@@ -24,17 +24,6 @@ function SectionCard({ sectionsArray }) {
           <h1 className="mb-4 font-poiretOneRegular text-6xl text-[#C1C1C1] hover:text-[#FFFFFF]">
             {section.title}
           </h1>
-          {/* {!!section.topics && (
-            <ul>
-              {section.topics.map((topic) => (
-                <li key={topic.id}>
-                  <p className="font-montserrat text-xl text-stone-600 ml-4">
-                    {topic.title}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )} */}
         </Link>
       ))}
     </>
