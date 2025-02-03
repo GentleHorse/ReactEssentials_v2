@@ -36,13 +36,18 @@ export const HOME_SECTIONS_ARRAY = [
   },
   {
     id: "s8",
-    title: "React router",
+    title: "React Router",
     path: "/react-router",
   },
   {
     id: "s9",
     title: "Authentication",
     path: "/authentication",
+  },
+  {
+    id: "s10",
+    title: "Tanstack Query",
+    path: "/tanstack-query",
   },
 ];
 
@@ -5998,6 +6003,51 @@ export const AUTHENTICATION_TOPICS_ARRAY = [
         return redirect("/");
       }
         `,
+      },
+    ],
+  },
+];
+
+export const TANSTACK_QUERY_TOPICS_ARRAY = [
+  {
+    id: "tp1",
+    title: "Intro",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+
+          `,
+      },
+    ],
+  },
+  {
+    id: "tp2",
+    title: "Fetching data",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+
+          `,
+      },
+    ],
+  },
+  {
+    id: "tp3",
+    title: "Submitting data",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "",
+        text: ``,
+        code: `
+
+          `,
       },
     ],
   },

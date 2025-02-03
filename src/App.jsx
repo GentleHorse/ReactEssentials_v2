@@ -10,6 +10,7 @@ import AdvancedPage from "./pages/Advanced.jsx";
 import ReduxPage from "./pages/Redux.jsx";
 import ReactRouterPage from "./pages/ReactRouter.jsx";
 import AuthenticationPage from "./pages/Authentication.jsx";
+import TanstackQueryPage from "./pages/TanstackQuery.jsx";
 import RootLayout from "./pages/Root.jsx";
 
 const router = createBrowserRouter([
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { path: "/redux", element: <ReduxPage /> },
       { path: "/react-router", element: <ReactRouterPage /> },
       { path: "/authentication", element: <AuthenticationPage /> },
+      { path: "/tanstack-query", element: <TanstackQueryPage /> },
     ],
   },
 ]);
