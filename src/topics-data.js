@@ -6015,10 +6015,39 @@ export const TANSTACK_QUERY_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "What is Tanstack Query?",
+        text: `A library that helps with sending HTTP requests & keeping your frontend UI in sync. You could do it with useEffect() function and fetch() function, but Tanstack Query can vastly simplify your code and your life as a developer. So why not use it? To get started, first install it with the below command.`,
         code: `
+      npm i @tanstack/react-query
+          `,
+      },
+      {
+        id: "sbtp2",
+        title: "What does Tanstack Query do?",
+        text: ` Tanstack query does not send HTTP requests, at least not on its own. You have to write the code that sends the actual HTTP request. Tanstack Query then manages the data, errors, cashing and much more. And one of its advantages is that Tanstack Query automatically refetch the data when the backend data is updated.`,
+      },
+      {
+        id: "sbtp3",
+        title: "Set up",
+        text: `In order to set up Tanstack Query in your application, you need to set up <QueryClient> & <QueryClientProvider> at a highest level.`,
+        code: `
+      // APP.jsx ---------------------------------------------------------------------------
 
+      import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+
+      ....
+
+      const queryClient = new QueryClient();
+
+      function App() {
+        return (
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        );
+      }
+
+      export default App;
           `,
       },
     ],
@@ -6029,10 +6058,205 @@ export const TANSTACK_QUERY_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "How to use useQuery()",
+        text: `“useQuery()” hook sends HTTP requests, get you data and give you the informations such as loading states and potential errors. “queryFn” property must be provided with the actual code you defined and “queryKey” also must be provided properly because respose data will be cashed by Tanstack Query and could be reused in the future. “data” property is something your defined HTTP request function returns (in the below case, “events”). “isPending” tells you whether your request is on its way or it already gets the response. “isError” tells you when something goes wrong but for that, you must throw error inside the your defined custom HTTP request.`,
         code: `
+      // NewEventsSection.jsx --------------------------------------------------------------
 
+      import { useQuery } from "@tanstack/react-query";
+      import { fetchEvents } from "../../util/http.js";
+
+      import LoadingIndicator from "../UI/LoadingIndicator.jsx";
+      import ErrorBlock from "../UI/ErrorBlock.jsx";
+      import EventItem from "./EventItem.jsx";
+
+      export default function NewEventsSection() {
+
+        // Use Tanstack Query to send HTTP request
+        const { data, isPending, isError, error } = useQuery({
+          queryKey: ["events"],
+          queryFn: fetchEvents,
+        });
+
+        let content;
+
+        if (isPending) {
+          content = <LoadingIndicator />;
+        }
+
+        if (isError) {
+          content = (
+            <ErrorBlock
+              title="An error occurred"
+              message={error.info?.message || "Failed to fetch events."}
+            />
+          );
+        }
+
+        if (data) {
+          content = (
+            <ul className="events-list">
+              {data.map((event) => (
+                <li key={event.id}>
+                  <EventItem event={event} />
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        return (
+          <section className="content-section" id="new-events-section">
+            <header>
+              <h2>Recently added events</h2>
+            </header>
+            {content}
+          </section>
+        );
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function fetchEvents() {
+        const response = await fetch("http://localhost:3000/events");
+
+        if (!response.ok) {
+          const error = new Error("An error occurred while fetching the events");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { events } = await response.json();
+
+        return events;
+      }
+          `,
+      },
+      {
+        id: "sbtp2",
+        title: "Query behaviours - cashe and stale data",
+        text: `Once “useQuery()” hook fetches the data, from next time it looks for cashe and use that data. But at the same time, behind the scene, it fetches the data for checking wheather there is an updated data or not. This is because the default “staleTime” property set to “0”. If you change for example “5000”, useQuery waits for 5000 milliseconds and then fetch the data. You can also control the cashe expiration by setting “gcTime” property whose default value is 5 mins.`,
+        code: `
+      const { data, isPending, isError, error } = useQuery({
+        queryKey: ["events"],
+        queryFn: fetchEvents,
+        staleTime: 5000,
+        gcTime: 1000,
+      });
+          `,
+      },
+      {
+        id: "sbtp3",
+        title: "Dynamic query functions and query keys",
+        text: `By contructing a query key dynamically, Tanstack Query can cashe and reuse different data for different keys based on the same query (here, it’s “events”). In order to trigger useQuery() hook according to user input, you cannot directly pass “searchElement.current.value” to “queryKey” & “queryFn” property, instead pass “searchTerm” because useState() hook can trigger reloading the page unlike useRef(). And by default, useQuery accepts an objects which includes “signal” property for aborting and other properties, you should pass “fetchEvents()” the objects with “signal” and “searchTerm” in the below example.`,
+        code: `
+      // FindEventSection.jsx --------------------------------------------------------------
+
+      export default function FindEventSection() {
+
+        // For getting user inputs and setting search terms for fetching data
+        const searchElement = useRef();
+        const [searchTerm, setSearchTerm] = useState("");
+
+        // useQuery to fetch an event
+        const { data, isPending, isError, error } = useQuery({
+          queryKey: ["events", { search: searchTerm }],
+          queryFn: ({ signal }) => fetchEvents({ signal, searchTerm }),
+        });
+
+        // Get the user input value
+        function handleSubmit(event) {
+          event.preventDefault();
+          setSearchTerm(searchElement.current.value);
+        }
+
+        // Content placeholder
+        let content = <p>Please enter a search term and to find events.</p>;
+
+        // When loading
+        if (isPending) {
+          content = <LoadingIndicator />;
+        }
+
+        // If something wrong happens
+        if (isError) {
+          content = (
+            <ErrorBlock
+              title="An error occurred!"
+              message={error.info?.message || "Failed to fetch events."}
+            />
+          );
+        }
+
+        // Successfully fetch data
+        if (data) {
+          content = (
+            <ul className="events-list">
+              {data.map((event) => (
+                <li key={event.id}>
+                  <EventItem event={event} />
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        return (
+          <section className="content-section" id="all-events-section">
+            <header>
+              <h2>Find your next event!</h2>
+              <form onSubmit={handleSubmit} id="search-form">
+                <input
+                  type="search"
+                  placeholder="Search events"
+                  ref={searchElement}
+                />
+                <button>Search</button>
+              </form>
+            </header>
+            {content}
+          </section>
+        );
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function fetchEvents({ signal, searchTerm }) {
+        let url = "http://localhost:3000/events";
+
+        if (searchTerm) {
+          url += "?search=" + searchTerm;
+        }
+
+        const response = await fetch(url, { signal: signal });
+
+        if (!response.ok) {
+          const error = new Error("An error occurred while fetching the events");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { events } = await response.json();
+
+        return events;
+      }
+          `,
+      },
+      {
+        id: "sbtp4",
+        title: "Enable and disable queries",
+        text: `In some occasions, you might need to enable and disable queries. You can control that with “enabled” property.  By setting “enabled” property dynamically, you can show no result at first, but once they start entering terms, show every results even if they put nothing inside the search box. This can be done by setting the default useState() hook value “undefined” (because empty string is not regarded as “undefined”).  Keep in mind that if you set “enabled” property false, useQuery treats as “pending” state, so “isPending” is true. In that case, it’s better to use “isLoading” property for logic because it returns false when “enabled” property set to false.`,
+        code: `
+      const searchElement = useRef();
+      const [searchTerm, setSearchTerm] = useState();
+
+      const { data, isLoading, isError, error } = useQuery({
+        queryKey: ["events", { search: searchTerm }],
+        queryFn: ({ signal }) => fetchEvents({ signal, searchTerm }),
+        enabled: searchTerm !== undefined
+      });
           `,
       },
     ],
