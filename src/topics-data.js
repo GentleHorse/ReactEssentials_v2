@@ -6345,6 +6345,122 @@ export const TANSTACK_QUERY_TOPICS_ARRAY = [
       });
           `,
       },
+      {
+        id: "sbtp5",
+        title: "Fetching data of dynamic routes",
+        text: `If you want to fetch dynamic routes with params, you need to use “useParams()” to get params and use it for the fetching function.`,
+        code: `
+      // EventDetails.jsx ------------------------------------------------------------------
+
+      import { useParams } from "react-router-dom";
+      import { useQuery } from "@tanstack/react-query";
+
+      ....
+
+      export default function EventDetails() {
+        
+        // Get params in the url
+        const params = useParams();
+
+        // Fetch event data based on param id
+        const { data, isPending, isError, error } = useQuery({
+          queryKey: ["events", { id: params.id }],
+          queryFn: ({ signal }) => fetchEvent({ signal, id: params.id }),
+        });
+
+        // Placeholder
+        let content;
+
+        // Fetching event
+        if (isPending) {
+          content = (
+            <div id="event-details-content" className="center">
+              <p>Fetching event data .... </p>
+            </div>
+          );
+        }
+
+        // If error happens
+        if (isError) {
+          content = (
+            <div id="event-details-content" className="center">
+              <ErrorBlock
+                title="Failed to load event"
+                message={
+                  error.info?.message ||
+                  "Failed to fetch event data, please try again later."
+                }
+              />
+            </div>
+          );
+        }
+
+        // If successfully fetch data
+        if (data) {
+          const formattedDate = new Date(data.date).toLocaleDateString("en-DE", {
+            day: "numeric",
+            month: "long", // 'short'
+            year: "numeric",
+          });
+        
+          content = (
+            <>
+              <header>
+                <h1>{data.title}</h1>
+                <nav>
+                  <button>Delete</button>
+                  <Link to="edit">Edit</Link>
+                </nav>
+              </header>
+              <div id="event-details-content">
+                <img src={\`http://localhost:3000/\${data.image}\`} alt={data.title} />
+                <div id="event-details-info">
+                  <div>
+                    <p id="event-details-location">{data.location}</p>
+                    <time dateTime={\`Todo-DateT$Todo-Time\`}>
+                      {formattedDate} @ {data.time}
+                    </time>
+                  </div>
+                  <p id="event-details-description">{data.description}</p>
+                </div>
+              </div>
+            </>
+          );
+        }
+
+        return (
+          <>
+            <Outlet />
+            <Header>
+              <Link to="/events" className="nav-item">
+                View all Events
+              </Link>
+            </Header>
+            <article id="event-details">{content}</article>
+          </>
+        );
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function fetchEvent({ signal, id }) {
+        const response = await fetch(\`http://localhost:3000/events/\${id}\`, {
+          signal,
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occured while fetching the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { event } = await response.json();
+
+        return event;
+      }
+          `,
+      },
     ],
   },
   {
@@ -6353,14 +6469,1014 @@ export const TANSTACK_QUERY_TOPICS_ARRAY = [
     subTopics: [
       {
         id: "sbtp1",
-        title: "",
-        text: ``,
+        title: "Changing data with Mutations",
+        text: `To submit data (”POST” HTTP request), you should use “useMutation()” because it’s otpimized for changing data. “useMutation()” does not send data automatically when the page is rendered. It does send data when you tell it by “mutate()” function. You can pass data which is required to the function set under “mutationFn” property to “mutate()” function `,
         code: `
+      // NewEvent.jsx ----------------------------------------------------------------------
 
+      export default function NewEvent() {
+        const navigate = useNavigate();
+
+        // Set up data submission
+        const { mutate, isPending, isError, error } = useMutation({
+          mutationFn: createNewEvent,
+        });
+
+        // Submit handler
+        function handleSubmit(formData) {
+          mutate({ event: formData });
+        }
+
+        return (
+          <Modal onClose={() => navigate("../")}>
+            <EventForm onSubmit={handleSubmit}>
+              {isPending && "Submitting .... "}
+              {!isPending && (
+                <>
+                  <Link to="../" className="button-text">
+                    Cancel
+                  </Link>
+                  <button type="submit" className="button">
+                    Create
+                  </button>
+                </>
+              )}
+            </EventForm>
+            {isError && (
+              <ErrorBlock
+                title="Failed to create event"
+                message={
+                  error.info?.message ||
+                  "Failed to create an event. Please check your inputs and try again later."
+                }
+              />
+            )}
+          </Modal>
+        );
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function createNewEvent(eventData) {
+        const response = await fetch(\`http://localhost:3000/events\`, {
+          method: "POST",
+          body: JSON.stringify(eventData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occured while creating the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { event } = await response.json();
+
+        return event;
+      }
+          `,
+      },
+      {
+        id: "sbtp2",
+        title: "Acting on mutation success",
+        text: `In most cases, you want to take some actions based on the response of “useMutation” HTTP request, which means you need to wait until its sending request is finished and only take actions when the request is success. You can do that with “onSuccess” property. In the below example, a user automatically goes to the “events” page only when the request is succeeded. `,
+        code: `
+      const { mutate, isPending, isError, error } = useMutation({
+        mutationFn: createNewEvent,
+        onSuccess: () => {
+          navigate("/events");
+        },
+      });
+          `,
+      },
+      {
+        id: "sbtp3",
+        title: "Invalidating queries",
+        text: `If you want to automatically update one query data based on the result of another query data, you need to use “invalidateQueries()” method of “QueryClient”. This tells queries to update an old data to new data. In order to do this, you need to outsource “QueryClient” from App.jsx file to another file such as http.js to make it useable for other components. “invalidateQueries()” can target a query with “queryKey” and it validates every query which includes the key (it does not only queries whose key completely matches the key, more dynamic). If you want to validates only exact matched key, you can add “exact” and set to “true”.`,
+        code: `
+      // util > http.js --------------------------------------------------------------------
+
+      import { QueryClient } from "@tanstack/react-query";
+
+      export const queryClient = new QueryClient();
+
+      // APP.jsx ---------------------------------------------------------------------------
+
+      import { queryClient } from "./util/http.js";
+
+      ....
+
+      function App() {
+        return (
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        );
+      }
+
+      export default App;
+
+      // NewEvent.jsx ----------------------------------------------------------------------
+
+        const { mutate, isPending, isError, error } = useMutation({
+          mutationFn: createNewEvent,
+          onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["events"]});
+            navigate("/events");
+          },
+        });
+          `,
+      },
+      {
+        id: "sbtp4",
+        title: "Deleting data",
+        text: `To delete data, which is submitting data, so you can use “useMutation()”. You also need to provide the dynamic params of url by using “useParams()”. And also, you need to set “refetchType” property of “invalidateQueries” to “none” for preventing fetching soon after deleting data, which avoids from fetching already deleted data again.`,
+        code: `
+      // EventDetails.jsx ------------------------------------------------------------------
+
+      import { useMutation } from "@tanstack/react-query";
+      import { deleteEvent, queryClient } from "../../util/http.js";
+
+      ....
+
+        const navigate = useNavigate();
+        const params = useParams();
+        
+        // Set up mutation query
+        const { mutate } = useMutation({
+          mutationFn: deleteEvent,
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["events"],
+              refetchType: "none",
+            });
+            navigate("/events");
+          },
+        });
+
+        // Delete handler
+        function handleDelete() {
+          mutate({ id: params.id });
+        }
+        
+        
+        ....
+        
+              // Button for call the handler
+              <button onClick={handleDelete}>Delete</button>
+
+
+      // util > http.js --------------------------------------------------------------------
+
+      import { QueryClient } from "@tanstack/react-query";
+
+      export const queryClient = new QueryClient();
+
+      export async function deleteEvent({ id }) {
+        const response = await fetch(\`http://localhost:3000/events/\${id}\`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occured while deleting the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        return response.json();
+      }
+          `,
+      },
+      {
+        id: "sbtp5",
+        title: "Delete confirmation modal",
+        text: `For better user experience, it’s recommended to implement a delete confirmation modal to let a user for choose proceeding deleting or not. “isDeleting” state controls the modal visibility, “handleStartDelete” triggers to open the modal, and “handleStopDelete” & “handleDelete” trigger to close the modal.`,
+        code: `
+      import { useState } from "react";
+      import { Link, Outlet, useParams, useNavigate } from "react-router-dom";
+      import { useQuery, useMutation } from "@tanstack/react-query";
+
+      import Header from "../Header.jsx";
+      import { fetchEvent, deleteEvent, queryClient } from "../../util/http.js";
+      import ErrorBlock from "../UI/ErrorBlock.jsx";
+      import Modal from "../UI/Modal.jsx";
+
+      export default function EventDetails() {
+
+        // Deleting state
+        const [isDeleting, setIsDeleting] = useState(false);
+
+        // Navigate 
+        const navigate = useNavigate();
+        
+        // Get params in url
+        const params = useParams();
+
+        ....
+
+        // Set up deleting query with "useMutation"
+        const {
+          mutate,
+          isPending: isPendingDeletion,
+          isError: isErrorDeleting,
+          error: deleteError,
+        } = useMutation({
+          mutationFn: deleteEvent,
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["events"],
+              refetchType: "none",
+            });
+            navigate("/events");
+          },
+        });
+
+        // Handler - start deleting
+        function handleStartDelete() {
+          setIsDeleting(true);
+        }
+
+        // Handler - cancel deleting
+        function handleStopDelete() {
+          setIsDeleting(false);
+        }
+
+        // Handler - proceed deleting
+        function handleDelete() {
+          mutate({ id: params.id });
+        }
+
+        ....
+
+        return (
+          <>
+            {isDeleting && (
+              <Modal onClose={handleStopDelete}>
+                <h2>Are you sure?</h2>
+                <p>
+                  Do you really want to delete this event? This action cannot be
+                  undone.
+                </p>
+                <div className="form-actions">
+                  {isPendingDeletion && <p>Deleting, please wait ....</p>}
+                  {!isPendingDeletion && (
+                    <>
+                      <button onClick={handleStopDelete} className="button-text">
+                        Cancel
+                      </button>
+                      <button onClick={handleDelete} className="button">
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+                {isErrorDeleting && (
+                  <ErrorBlock
+                    title="Failed to delete event"
+                    message={
+                      deleteError.info?.message ||
+                      "Failed to delete event, please try again later."
+                    }
+                  />
+                )}
+              </Modal>
+            )}
+            
+            ....
+            
+            
+          </>
+        );
+      }
           `,
       },
     ],
   },
+  {
+    id: "tp4",
+    title: "Modifying data",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "1. Show modal filled with existing elements",
+        text: `When you go to edit page, normaly you can see a form filled with existing elements such as texts and images. To do this, you need to fetch data with query based on url params and pass the fetched data to the form. Here is an example.`,
+        code: `
+      // EditEvent.jsx ---------------------------------------------------------------------
+
+      import { Link, useNavigate, useParams } from "react-router-dom";
+      import { useQuery } from "@tanstack/react-query";
+
+      import Modal from "../UI/Modal.jsx";
+      import EventForm from "./EventForm.jsx";
+      import { fetchEvent } from "../../util/http.js";
+      import LoadingIndicator from "../UI/LoadingIndicator.jsx";
+      import ErrorBlock from "../UI/ErrorBlock.jsx";
+
+      export default function EditEvent() {
+
+        // useNavigate
+        const navigate = useNavigate();
+        
+        // Get params in url
+        const params = useParams();
+
+        // Set up query for fetching existing event data
+        const { data, isPending, isError, error } = useQuery({
+          queryKey: ["events", { id: params.id }],
+          queryFn: ({ signal }) => fetchEvent({ signal, id: params.id }),
+        });
+
+        ....
+
+        // Handler to close modal
+        function handleClose() {
+          navigate("../");
+        }
+
+        // Placeholder
+        let content;
+
+        // Whilst loading
+        if (isPending) {
+          content = (
+            <div className="center">
+              <LoadingIndicator />
+            </div>
+          );
+        }
+
+        // If something goes wrong
+        if (isError) {
+          content = (
+            <>
+              <ErrorBlock
+                title="Failed to load event"
+                message={
+                  error.info?.message ||
+                  "Failed to load event. Please check your inputs and try again later."
+                }
+              />
+              <div className="form-actions">
+                <Link to="../" className="button">
+                  Okay
+                </Link>
+              </div>
+            </>
+          );
+        }
+
+        // If successfully fetch data, pass data to form
+        if (data) {
+          content = (
+            <EventForm inputData={data} onSubmit={handleSubmit}>
+              <Link to="../" className="button-text">
+                Cancel
+              </Link>
+              <button type="submit" className="button">
+                Update
+              </button>
+            </EventForm>
+          );
+        }
+
+        return <Modal onClose={handleClose}>{content}</Modal>;
+      }
+
+      // EventForm.jsx ---------------------------------------------------------------------
+
+      export default function EventForm({ inputData }) {
+        
+        ....
+
+        return (
+          <form>
+            <p className="control">
+              <label htmlFor="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                defaultValue={inputData?.title ?? ""}
+              />
+            </p>
+
+            ....
+            
+            <p className="control">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                defaultValue={inputData?.description ?? ""}
+              />
+            </p>
+
+            <div className="controls-row">
+              <p className="control">
+                <label htmlFor="date">Date</label>
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  defaultValue={inputData?.date ?? ""}
+                />
+              </p>
+
+              <p className="control">
+                <label htmlFor="time">Time</label>
+                <input
+                  type="time"
+                  id="time"
+                  name="time"
+                  defaultValue={inputData?.time ?? ""}
+                />
+              </p>
+            </div>
+
+            <p className="control">
+              <label htmlFor="location">Location</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                defaultValue={inputData?.location ?? ""}
+              />
+            </p>
+
+            ....
+            
+          </form>
+        );
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function fetchEvent({ signal, id }) {
+        const response = await fetch(\`http://localhost:3000/events/\${id}\`, {
+          signal,
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occured while fetching the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { event } = await response.json();
+
+        return event;
+      }
+          `,
+      },
+      {
+        id: "sbtp2",
+        title: "2. Submit the edited form ",
+        text: `After a user modify the form, let them submit it with “useMutation()”. And here, in order to reflect the updated data to the page immediately, use “onMutate” property, which activates soon after starting fetching data without wating a response. Conveniently React Query automatically gets the data sent to backend, which is here “{ id: params.id, event: formData }”, so you can access that data (= “data”) inside “useMutate()” hook. “setQueryData” requires the target query as the first param, and the updated data as the second param. Also you better to cancel any query updates to the tartget query by “cancelQueries” method to prevent any unexpected crush. “cancelQueries” cancels “useQuery” and NOT “useMutation” so there will be no conflicts.`,
+        code: `
+      // EditEvent.jsx ---------------------------------------------------------------------
+
+      export default function EditEvent() {
+
+        // useNavigate
+        const navigate = useNavigate();
+        
+        // Get params in url
+        const params = useParams();
+
+        ....  // Code: Fetch existing data with useQuery()
+
+        // Prepare fetching with useMutation  
+        const { mutate } = useMutation({
+          mutationFn: updateEvent,
+          onMutate: async (data) => {
+            // Get data sent to backend
+            const newEvent = data.event;
+
+            // Cancel any queries with useQuery()
+            await queryClient.cancelQueries({
+              queryKey: ["events", { id: params.id }],
+            });
+
+            // Update the target query data
+            queryClient.setQueryData(["events", { id: params.id }], newEvent);
+          },
+        });
+
+        // Send updated data to backend
+        function handleSubmit(formData) {
+          mutate({ id: params.id, event: formData });
+          navigate("../");
+        }
+        
+        // Placeholder
+        let content;  
+
+        ....
+
+        // "data" is existing one which is fetched by useQuery 
+        if (data) {
+          content = (
+            <EventForm inputData={data} onSubmit={handleSubmit}>
+              <Link to="../" className="button-text">
+                Cancel
+              </Link>
+              <button type="submit" className="button">
+                Update
+              </button>
+            </EventForm>
+          );
+        }
+
+        return <Modal onClose={handleClose}>{content}</Modal>;
+      }
+
+
+      // EventForm.jsx ---------------------------------------------------------------------
+
+      import { useState } from "react";
+      import { useQuery } from "@tanstack/react-query";
+
+      import ImagePicker from "../ImagePicker.jsx";
+      import { fetchSelectableImages } from "../../util/http.js";
+      import ErrorBlock from "../UI/ErrorBlock.jsx";
+
+      export default function EventForm({ inputData, onSubmit, children }) {
+
+        // Selected image state
+        const [selectedImage, setSelectedImage] = useState(inputData?.image);
+
+        ....
+        
+        // Set selected image
+        function handleSelectImage(image) {
+          setSelectedImage(image);
+        }
+
+        // Handler for submitting data
+        function handleSubmit(event) {
+          event.preventDefault();
+
+          const formData = new FormData(event.target);
+          const data = Object.fromEntries(formData);
+
+          // Passes data to "EditEvent.jsx" 
+          onSubmit({ ...data, image: selectedImage });
+        }
+
+        return (
+          <form id="event-form" onSubmit={handleSubmit}>
+            <p className="control">
+              <label htmlFor="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                defaultValue={inputData?.title ?? ""}
+              />
+            </p>
+
+            {isPending && <p>Loading selectable images .... </p>}
+            {isError && <ErrorBlock title="Please try again later" />}
+            {data && (
+              <div className="control">
+                <ImagePicker
+                  images={data}
+                  onSelect={handleSelectImage}
+                  selectedImage={selectedImage}
+                />
+              </div>
+            )}
+
+            <p className="control">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                defaultValue={inputData?.description ?? ""}
+              />
+            </p>
+
+            <div className="controls-row">
+              <p className="control">
+                <label htmlFor="date">Date</label>
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  defaultValue={inputData?.date ?? ""}
+                />
+              </p>
+
+              <p className="control">
+                <label htmlFor="time">Time</label>
+                <input
+                  type="time"
+                  id="time"
+                  name="time"
+                  defaultValue={inputData?.time ?? ""}
+                />
+              </p>
+            </div>
+
+            <p className="control">
+              <label htmlFor="location">Location</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                defaultValue={inputData?.location ?? ""}
+              />
+            </p>
+
+            <p className="form-actions">{children}</p>
+          </form>
+        );
+      }
+
+      // ImagePicker.jsx -------------------------------------------------------------------
+
+      export default function ImagePicker({ images, selectedImage, onSelect }) {
+        return (
+          <div id="image-picker">
+            <p>Select an image</p>
+            <ul>
+              {images.map((image) => (
+                <li
+                  key={image.path}
+                  onClick={() => onSelect(image.path)}
+                  className={selectedImage === image.path ? 'selected' : undefined}
+                >
+                  <img
+                    src={\`http://localhost:3000/\${image.path}\`}
+                    alt={image.caption}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function updateEvent({ id, event }) {
+        const response = await fetch(\`http://localhost:3000/events/\${id}\`, {
+          method: "PUT",
+          body: JSON.stringify({ event }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occurred whilst updating the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        return response.json();
+      }
+          `,
+      },
+      {
+        id: "sbtp3",
+        title: "3. Prepare rollback in case of error",
+        text: `Updating query data without waiting for a response could be done even if an error occurs. Thus, it’s good practice to prepare rollback in case of that. You can save the old target query data by calling “getQueryData” method before updating the query, and this can be accessible as “context” variable of “onError” by returning it inside “onMutate” property.  “onSettled” property is called after submitting data wheather it’s succeeded or failed. So better to update all the queries which is related to the target query inside “onSettled” property in order to make sure the frontend and backend are synchronized without any issues.`,
+        code: `
+      const { mutate } = useMutation({
+      
+        mutationFn: updateEvent,
+        
+        onMutate: async (data) => {
+        
+          // Get data sent to backend
+          const newEvent = data.event;
+
+          // Cancel any queries with useQuery()
+          await queryClient.cancelQueries({
+            queryKey: ["events", { id: params.id }],
+          });
+
+          // Save the old data for rollback
+          const previousEvent = queryClient.getQueryData([
+            "events",
+            { id: params.id },
+          ]);
+
+          // Update the target query data
+          queryClient.setQueryData(["events", { id: params.id }], newEvent);
+
+          return { previousEvent };
+        },
+        
+        onError: (error, data, context) => {
+
+          // Rolling back if there's an error
+          queryClient.setQueriesData(
+            ["events", { id: params.id }],
+            context.previousEvent
+          );
+        },
+        
+        onSettled: () => {
+
+          // Update all the related queries 
+          queryClient.invalidateQueries(["events", { id: params.id }])
+        }
+      });
+          `,
+      },
+    ]
+  },
+  {
+    id: "tp5",
+    title: "And more",
+    subTopics: [
+      {
+        id: "sbtp1",
+        title: "Using the Query Key As Query Function Input",
+        text: `Inside the function set to “queryFn” property of “useQuery”, you can access “queryKey”. So you can use “queryKey” to set the query function input by deconstructing. In the below example, “…queryKey[0]” is “events” and “…queryKey[1]” is “{ max: 3 }” .`,
+        code: `
+      // NewEventSection.jsx ---------------------------------------------------------------
+
+        const { data, isPending, isError, error } = useQuery({
+          queryKey: ["events", { max: 3 }],
+          queryFn: ({ signal, queryKey }) => fetchEvents({ signal, ...queryKey[1] }),
+          staleTime: 5000,
+        });
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function fetchEvents({ signal, searchTerm, max }) {
+        let url = "http://localhost:3000/events";
+
+        if (searchTerm && max) {
+          url += "?search=" + searchTerm + "&max=" + max;
+        } else if (searchTerm) {
+          url += "?search=" + searchTerm;
+        } else if (max) {
+          url += "?max=" + max;
+        }
+
+        const response = await fetch(url, { signal: signal });
+
+        if (!response.ok) {
+          const error = new Error("An error occurred while fetching the events");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { events } = await response.json();
+
+        return events;
+      }
+
+      // backend > app.js ------------------------------------------------------------------
+
+      app.get('/events', async (req, res) => {
+        const { max, search } = req.query;
+        const eventsFileContent = await fs.readFile('./data/events.json');
+        let events = JSON.parse(eventsFileContent);
+
+        if (search) {
+          events = events.filter((event) => {
+            const searchableText = \`\${event.title} \${event.description} \${event.location}\`;
+            return searchableText.toLowerCase().includes(search.toLowerCase());
+          });
+        }
+
+        if (max) {
+          events = events.slice(events.length - max, events.length);
+        }
+
+        res.json({
+          events: events.map((event) => ({
+            id: event.id,
+            title: event.title,
+            image: event.image,
+            date: event.date,
+            location: event.location,
+          })),
+        });
+      });
+          `,
+      },
+      {
+        id: "sbtp2",
+        title: "Using queries with loader()",
+        text: `You can use queries inside “loader()” function by using “fetchQuery” method of “queryClient”. You cannot use “useQuery()” because it’s outside React components. But this method is equivalent to it. And “loader()” function will be executed by react router, so it eventually gets access to route parameters. And it’s important to leave “useQuery()” inside the component because it collects the fetched data from query cashes and passes it to <EventForm> component. In addtion to this, you better to set “staleTime” (in the below example, it’s 10s) for preventing unneccessary sending data because by default, useQuery sends a HTTP request to fetch the latest data even though the data is fetched a second ago.`,
+        code: `
+      // App.jsx ---------------------------------------------------------------------------
+
+      import EditEvent, {
+        loader as editEventLoader,
+      } from "./components/Events/EditEvent.jsx";
+
+          ....
+
+            {
+              path: "/events/:id/edit",
+              element: <EditEvent />,
+              loader: editEventLoader
+            },
+
+      // EditEvent.jsx ---------------------------------------------------------------------
+
+      export default function EditEvent() {
+        
+        ...
+
+        const { data, isError, error } = useQuery({
+          queryKey: ["events", { id: params.id }],
+          queryFn: ({ signal }) => fetchEvent({ signal, id: params.id }),
+          staleTime: 10000,
+        });
+        
+        ....
+
+        let content;
+
+        ....
+
+        if (data) {
+          content = (
+            <EventForm inputData={data} onSubmit={handleSubmit}>
+              <Link to="../" className="button-text">
+                Cancel
+              </Link>
+              <button type="submit" className="button">
+                Update
+              </button>
+            </EventForm>
+          );
+        }
+
+        return <Modal onClose={handleClose}>{content}</Modal>;
+      }
+        
+        
+
+      }
+
+      export function loader({ params }) {
+        return queryClient.fetchQuery({
+          queryKey: ["events", { id: params.id }],
+          queryFn: ({ signal }) => fetchEvent({ signal, id: params.id }),
+        });
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function fetchEvent({ signal, id }) {
+        const response = await fetch(\`http://localhost:3000/events/\${id}\`, {
+          signal,
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occured while fetching the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        const { event } = await response.json();
+
+        return event;
+      }
+          `,
+      },
+      {
+        id: "sbtp3",
+        title: "Using queries with action()",
+        text: `Since “action()” function will be executed by react router, it can access to “request” and “params”. In order to execute “action()”, you need to use “useSubmit()” for manually sending HTTP requests. Then you can replace it with “useMutate()”.`,
+        code: `
+      // App.jsx ---------------------------------------------------------------------------
+
+      import EditEvent, {
+        loader as editEventLoader,
+        action as editEventAction,
+      } from "./components/Events/EditEvent.jsx";
+
+          ....
+
+            {
+              path: "/events/:id/edit",
+              element: <EditEvent />,
+              loader: editEventLoader,
+              action: editEventAction,
+            },
+            
+      // EditEvent.jsx ---------------------------------------------------------------------
+
+      export default function EditEvent() {
+
+        // For manual HTTP request submission
+        const submit = useSubmit();
+        
+        ....
+
+        // Send http requests to backend
+        function handleSubmit(formData) {
+          submit(formData, { method: "PUT" }); // Trigger "action()"
+        }
+
+        ....
+
+        let content;
+
+        ....
+
+        if (data) {
+          content = (
+            <EventForm inputData={data} onSubmit={handleSubmit}>
+              <Link to="../" className="button-text">
+                Cancel
+              </Link>
+              <button type="submit" className="button">
+                Update
+              </button>
+            </EventForm>
+          );
+        }
+
+        return <Modal onClose={handleClose}>{content}</Modal>;
+      }
+
+      ....
+
+      export async function action({ request, params }) {
+        // Get data from request (a bit complex form)
+        const formData = await request.formData();
+
+        // Turn data into key-value object
+        const updatedEventData = Object.fromEntries(formData);
+
+        // Send data to backend
+        await updateEvent({ id: params.id, event: updatedEventData });
+
+        // Update queries
+        await queryClient.invalidateQueries(["events"]);
+
+        // Redirect to the parent page
+        return redirect("../");
+      }
+
+      // util > http.js --------------------------------------------------------------------
+
+      export async function updateEvent({ id, event }) {
+        const response = await fetch(\`http://localhost:3000/events/\${id}\`, {
+          method: "PUT",
+          body: JSON.stringify({ event }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const error = new Error("An error occurred whilst updating the event");
+          error.code = response.status;
+          error.info = await response.json();
+          throw error;
+        }
+
+        return response.json();
+      }
+          `,
+      },
+      {
+        id: "sbtp4",
+        title: "Fetching state for UI",
+        text: `With “useIsFetching()” is an optional hook that returns the number of the queries that your application is loading or fetching in the background (useful for app-wide loading indicators). `,
+        code: `
+      import { useIsFetching } from "@tanstack/react-query";
+
+      export default function Header({ children }) {
+
+        const fetching = useIsFetching();
+        
+        return (
+          <>
+            <div id="main-header-loading">{fetching > 0 && <progress />}</div>
+            
+            <header id="main-header">
+              <div id="header-title">
+                <h1>React Events</h1>
+              </div>
+              <nav>{children}</nav>
+            </header>
+          </>
+        );
+      }
+          `,
+      },
+    ]}
 ];
 
 export const MOUSE_EVENTS = [
