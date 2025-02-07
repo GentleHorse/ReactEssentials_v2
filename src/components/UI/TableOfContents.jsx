@@ -1,4 +1,5 @@
 import { HashLink } from "react-router-hash-link";
+import { motion } from "framer-motion";
 
 export default function TableOfContents({ topics, textsPosition = "center" }) {
   const scrollWithOffset = (el) => {
@@ -14,26 +15,27 @@ export default function TableOfContents({ topics, textsPosition = "center" }) {
   }
   if (textsPosition === "left") {
     sectionClassName += " text-left ml-2";
-  } 
+  }
   if (textsPosition === "right") {
     sectionClassName += " text-right mr-2";
-  } 
-  
+  }
 
   return (
     <section className={sectionClassName}>
-      {/* <h1 className="text-2xl text-[#C1C1C1] bg-[#1C1C1C]">
-        Table of Contents
-      </h1> */}
       <ul className="border-b-2 border-[#C1C1C1] pt-4 pb-6 flex flex-col gap-5">
         {topics.map((topic) => (
           <HashLink
             to={`#${topic.id}`}
             key={topic.id}
             scroll={(el) => scrollWithOffset(el)}
-            className="hover:font-bold text-4xl text-[#91989F] hover:text-[#2B5F75]"
           >
-            <h1>{topic.title}</h1>
+            <motion.h1
+              className="text-4xl text-[#91989F] hover:text-[#d34a75]"
+              whileHover={{ scale: 1.025 }}
+              transition={{type: "tween"}}
+            >
+              {topic.title}
+            </motion.h1>
           </HashLink>
         ))}
       </ul>
